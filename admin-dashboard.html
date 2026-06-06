@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Admin Dashboard — BlockDegree</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .sc-log { font-family:var(--font-mono); font-size:12px; background:var(--bg); padding:16px; border-radius:8px; border:1px solid var(--border); color:var(--green); line-height:1.9; overflow-x:auto; }
+    .report-box { font-family:var(--font-mono); font-size:12px; color:var(--text2); line-height:1.9; }
+    .danger-zone { display:flex; gap:10px; flex-wrap:wrap; }
+    .abi-box { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:var(--font-mono); font-size:11px; color:var(--accent3); line-height:1.8; display:none; margin-top:12px; }
+    .abi-box.show { display:block; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🛡️</div>
+      <h2>BlockDegree</h2>
+      <p>Super Admin Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Dashboard</div>
+      <a class="nav-item active" onclick="adminPage('dashboard',this)"><span class="icon">📊</span> Overview</a>
+      <a class="nav-item" onclick="adminPage('analytics',this)"><span class="icon">📈</span> Analytics</a>
+
+      <div class="nav-section-label">Management</div>
+      <a class="nav-item" onclick="adminPage('universities',this)"><span class="icon">🏛️</span> Universities</a>
+      <a class="nav-item" onclick="adminPage('students',this)"><span class="icon">🎓</span> Students</a>
+      <a class="nav-item" onclick="adminPage('employers',this)"><span class="icon">🏢</span> Employers</a>
+      <a class="nav-item" onclick="adminPage('degrees',this)"><span class="icon">📜</span> All Degrees</a>
+
+      <div class="nav-section-label">Security</div>
+      <a class="nav-item" onclick="adminPage('verifications',this)"><span class="icon">✅</span> Verifications</a>
+      <a class="nav-item" onclick="adminPage('fraud',this)">
+        <span class="icon">🚨</span> Fraud & Alerts
+        <span class="nav-badge">1</span>
+      </a>
+      <a class="nav-item" onclick="adminPage('audit',this)"><span class="icon">📋</span> Audit Logs</a>
+
+      <div class="nav-section-label">System</div>
+      <a class="nav-item" onclick="adminPage('reports',this)"><span class="icon">📄</span> Reports</a>
+      <a class="nav-item" onclick="adminPage('smart-contracts',this)"><span class="icon">📝</span> Smart Contracts</a>
+      <a class="nav-item" onclick="adminPage('monitoring',this)"><span class="icon">⚡</span> Monitoring</a>
+      <a class="nav-item" onclick="adminPage('settings',this)"><span class="icon">⚙️</span> System Settings</a>
+      <div class="nav-section-label">Navigation</div>
+      <a class="nav-item" href="user-dashboard.html"><span class="icon">🎓</span> Student Portal</a>
+      <a class="nav-item" href="employer-dashboard.html"><span class="icon">🏢</span> Employer Portal</a>
+      <a class="nav-item" href="index.html"><span class="icon">↩️</span> Home</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar" style="background:linear-gradient(135deg,var(--red),var(--accent2))">SA</div>
+      <div>
+        <div class="footer-name">Super Admin</div>
+        <div class="footer-role" style="color:var(--red)">● Root Access</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;color:var(--text);font-size:18px;cursor:pointer">☰</button>
+        <h1 id="admin-page-title">System Overview</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="chain-status"><div class="dot"></div> Blockchain Online</div>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">Peers: 4/4 · Block #18,204</span>
+        <span class="topbar-badge">1 ALERT</span>
+        <button class="btn btn-primary btn-sm" onclick="showAdminModal('addUserModal')">+ Add User</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ OVERVIEW ══ -->
+      <div class="admin-page active" id="ap-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card blue"><div class="label">Total Degrees Issued</div><div class="value">5</div><div class="sub">All time · on-chain</div><div class="icon-bg">📜</div></div>
+          <div class="stat-card green"><div class="label">Verified Degrees</div><div class="value">2</div><div class="sub">Successful verifications</div><div class="icon-bg">✅</div></div>
+          <div class="stat-card red"><div class="label">Fraud Attempts</div><div class="value">1</div><div class="sub">Detected & blocked</div><div class="icon-bg">🚨</div></div>
+          <div class="stat-card yellow"><div class="label">Revoked Degrees</div><div class="value">1</div><div class="sub">By universities</div><div class="icon-bg">🚫</div></div>
+          <div class="stat-card purple"><div class="label">Registered Users</div><div class="value">7</div><div class="sub">2 unis · 3 students · 2 emp</div><div class="icon-bg">👥</div></div>
+          <div class="stat-card orange"><div class="label">Smart Contracts</div><div class="value">3</div><div class="sub">Active on chain</div><div class="icon-bg">📝</div></div>
+        </div>
+
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><h3>🕐 Recent Audit Logs</h3><button class="btn btn-outline btn-sm" onclick="adminPage('audit',null)">View All →</button></div>
+            <div class="section-body" id="admin-recent-logs"></div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h3>🖥️ System Health</h3></div>
+            <div class="section-body">
+              <div class="metric-row">
+                <div class="mini-stat"><div class="ml">Block Height</div><div class="mv" style="color:var(--accent)">18,204</div></div>
+                <div class="mini-stat"><div class="ml">TX/min</div><div class="mv" style="color:var(--green)">2.4</div></div>
+                <div class="mini-stat"><div class="ml">Peers</div><div class="mv" style="color:var(--accent2)">4/4</div></div>
+                <div class="mini-stat"><div class="ml">Uptime</div><div class="mv" style="color:var(--green)">99.9%</div></div>
+              </div>
+              <div style="margin-top:6px">
+                <div class="bar-h"><div class="label">Degree Issuances</div><div class="bar-track"><div class="bar-fill" style="width:83%"></div></div><div class="val">5</div></div>
+                <div class="bar-h"><div class="label">Verifications</div><div class="bar-track"><div class="bar-fill" style="width:67%"></div></div><div class="val">4</div></div>
+                <div class="bar-h"><div class="label">Fraud Blocked</div><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--red)"></div></div><div class="val">1</div></div>
+                <div class="bar-h"><div class="label">Revocations</div><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--yellow)"></div></div><div class="val">1</div></div>
+                <div class="bar-h"><div class="label">Unauthorized</div><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--orange)"></div></div><div class="val">1</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><h3>🏛️ Universities</h3><button class="btn btn-outline btn-sm" onclick="adminPage('universities',null)">Manage →</button></div>
+            <div class="section-body" id="admin-uni-summary"></div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h3>🏢 Employers</h3><button class="btn btn-outline btn-sm" onclick="adminPage('employers',null)">Manage →</button></div>
+            <div class="section-body" id="admin-emp-summary"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ANALYTICS ══ -->
+      <div class="admin-page" id="ap-analytics">
+        <div class="stats-grid">
+          <div class="stat-card blue"><div class="label">Avg TX Time</div><div class="value">1.2s</div><div class="sub">Blockchain confirmation</div></div>
+          <div class="stat-card green"><div class="label">Verification Success Rate</div><div class="value">50%</div><div class="sub">Of all verification attempts</div></div>
+          <div class="stat-card red"><div class="label">Fraud Rate</div><div class="value">25%</div><div class="sub">Of total verification requests</div></div>
+          <div class="stat-card yellow"><div class="label">Revocation Rate</div><div class="value">20%</div><div class="sub">Of issued degrees</div></div>
+        </div>
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><h3>📊 Degrees by University</h3></div>
+            <div class="section-body">
+              <div class="bar-h"><div class="label">Iqra Univ.</div><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div><div class="val">3</div></div>
+              <div class="bar-h"><div class="label">FAST-NUCES</div><div class="bar-track"><div class="bar-fill" style="width:40%"></div></div><div class="val">2</div></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h3>📊 Verification Outcomes</h3></div>
+            <div class="section-body">
+              <div class="bar-h"><div class="label">Verified</div><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><div class="val">2</div></div>
+              <div class="bar-h"><div class="label">Revoked</div><div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--yellow)"></div></div><div class="val">1</div></div>
+              <div class="bar-h"><div class="label">Fraud</div><div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--red)"></div></div><div class="val">1</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>📊 Programs Distribution</h3></div>
+          <div class="section-body">
+            <div class="bar-h"><div class="label">BSCS</div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">BSEE</div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">BSME</div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">MSCS</div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">MBA</div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><div class="val">1</div></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>📊 Audit Log Action Breakdown</h3></div>
+          <div class="section-body">
+            <div class="bar-h"><div class="label">Degree Issued</div><div class="bar-track"><div class="bar-fill" style="width:45%"></div></div><div class="val">5</div></div>
+            <div class="bar-h"><div class="label">Degree Verified</div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><div class="val">2</div></div>
+            <div class="bar-h"><div class="label">Degree Revoked</div><div class="bar-track"><div class="bar-fill" style="width:9%;background:var(--yellow)"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">Verif. Fail</div><div class="bar-track"><div class="bar-fill" style="width:9%;background:var(--orange)"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">Fraud Detected</div><div class="bar-track"><div class="bar-fill" style="width:9%;background:var(--red)"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">Unauthorized</div><div class="bar-track"><div class="bar-fill" style="width:9%;background:var(--red)"></div></div><div class="val">1</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ UNIVERSITIES ══ -->
+      <div class="admin-page" id="ap-universities">
+        <div class="section">
+          <div class="section-header"><h3>🏛️ Registered Universities</h3><button class="btn btn-primary btn-sm" onclick="showAdminModal('addUniModal')">+ Add University</button></div>
+          <div class="section-body table-wrap" id="uni-table-container"></div>
+        </div>
+      </div>
+
+      <!-- ══ STUDENTS ══ -->
+      <div class="admin-page" id="ap-students">
+        <div class="section">
+          <div class="section-header"><h3>🎓 Registered Students</h3><button class="btn btn-primary btn-sm" onclick="showAdminModal('addUserModal')">+ Add Student</button></div>
+          <div class="section-body table-wrap" id="students-table-container"></div>
+        </div>
+      </div>
+
+      <!-- ══ EMPLOYERS ══ -->
+      <div class="admin-page" id="ap-employers">
+        <div class="section">
+          <div class="section-header"><h3>🏢 Registered Employers</h3><button class="btn btn-primary btn-sm" onclick="showAdminModal('addEmpModal')">+ Add Employer</button></div>
+          <div class="section-body table-wrap" id="employers-table-container"></div>
+        </div>
+      </div>
+
+      <!-- ══ DEGREES ══ -->
+      <div class="admin-page" id="ap-degrees">
+        <div class="section">
+          <div class="section-header">
+            <h3>📜 All Issued Degrees</h3>
+            <div style="display:flex;gap:8px">
+              <input id="deg-search" placeholder="Search by ID, student, program..." style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);font-family:var(--font-body);font-size:12px;width:220px" oninput="filterDegrees()" />
+              <select id="deg-status-filter" onchange="filterDegrees()" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--font-body);font-size:12px">
+                <option value="">All Status</option>
+                <option value="valid">Valid</option>
+                <option value="revoked">Revoked</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="showAdminModal('issueDegreeModal')">+ Issue Degree</button>
+            </div>
+          </div>
+          <div class="section-body table-wrap" id="degrees-table-container"></div>
+        </div>
+      </div>
+
+      <!-- ══ VERIFICATIONS ══ -->
+      <div class="admin-page" id="ap-verifications">
+        <div class="stats-grid">
+          <div class="stat-card green"><div class="label">Verified</div><div class="value">2</div><div class="icon-bg">✅</div></div>
+          <div class="stat-card yellow"><div class="label">Revoked Found</div><div class="value">1</div><div class="icon-bg">🚫</div></div>
+          <div class="stat-card red"><div class="label">Fraud Attempts</div><div class="value">1</div><div class="icon-bg">🚨</div></div>
+          <div class="stat-card blue"><div class="label">Avg Response</div><div class="value" style="font-size:20px">1.0s</div><div class="icon-bg">⚡</div></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>✅ All Verification Requests</h3><button class="btn btn-outline btn-sm" onclick="exportVerif()">⬇ Export CSV</button></div>
+          <div class="section-body table-wrap" id="verif-table-container"></div>
+        </div>
+      </div>
+
+      <!-- ══ FRAUD ══ -->
+      <div class="admin-page" id="ap-fraud">
+        <div class="alert alert-danger">🚨 1 active fraud alert detected. Immediate review required.</div>
+        <div class="fraud-card">
+          <h4>🚨 FRAUD ATTEMPT — Degree FAKE999</h4>
+          <div style="font-size:13px;margin-bottom:12px">Employer <strong>EMP002 (FinanceHub Inc)</strong> attempted to verify non-existent degree <code style="color:var(--accent)">FAKE999</code> on <strong>2024-09-06 16:45</strong>.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:12px">
+            <div><span style="color:var(--muted)">Submitted Hash:</span><br><span class="mono" style="font-size:11px">0xFAKEHASH999_TAMPERED_DATA...</span></div>
+            <div><span style="color:var(--muted)">Smart Contract:</span><br><span style="color:var(--red)">FRAUD_DETECTED event emitted</span></div>
+            <div><span style="color:var(--muted)">Audit Log:</span><br><span class="mono">LOG010</span></div>
+            <div><span style="color:var(--muted)">Tx Hash:</span><br><span class="mono">0xVTX004I4D5E6F7...</span></div>
+          </div>
+          <div class="hash" style="margin-bottom:12px;font-size:10px">Attempted Hash: 0xFAKEHASH999_TAMPERED_DATA_XYZ_INVALID_DEGREE_RECORD...</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-danger btn-sm" onclick="blockEmployer()">🚫 Block Employer</button>
+            <button class="btn btn-outline btn-sm" onclick="adminPage('audit',null)">📋 View Audit Log</button>
+            <button class="btn btn-purple btn-sm" onclick="this.closest('.fraud-card').style.opacity='.4';this.textContent='✅ Reviewed'">✅ Mark Reviewed</button>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>🔒 Unauthorized Access Attempts</h3></div>
+          <div class="section-body">
+            <div class="alert alert-danger">⚠️ <strong>2024-09-07 02:30</strong> — UNKNOWN actor attempted to access <strong>DEG002</strong> without authorization. AccessContract.checkAccess() rejected. IP address logged. Audit entry LOG011 created.</div>
+            <div class="alert alert-warning" style="margin-bottom:0">ℹ️ Auto-block threshold: 3 fraud attempts. EMP002 currently at 1/3. Monitoring active.</div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>📋 All Fraud & Security Incidents</h3></div>
+          <div class="section-body table-wrap">
+            <table>
+              <thead><tr><th>Log ID</th><th>Action</th><th>Actor</th><th>Target</th><th>Timestamp</th><th>TX Time</th><th>Status</th></tr></thead>
+              <tbody id="fraud-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ AUDIT LOGS ══ -->
+      <div class="admin-page" id="ap-audit">
+        <div class="section">
+          <div class="section-header">
+            <h3>📋 Full Audit Log</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select id="log-filter" onchange="filterLogs()" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--font-body);font-size:12px">
+                <option value="">All Actions</option>
+                <option>DEGREE_ISSUED</option>
+                <option>DEGREE_VERIFIED</option>
+                <option>DEGREE_REVOKED</option>
+                <option>VERIFICATION_FAIL</option>
+                <option>FRAUD_DETECTED</option>
+                <option>UNAUTHORIZED_ACCESS</option>
+              </select>
+              <select id="log-status-filter" onchange="filterLogs()" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--font-body);font-size:12px">
+                <option value="">All Status</option>
+                <option value="success">Success</option>
+                <option value="warning">Warning</option>
+                <option value="danger">Danger</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="exportLogs()">⬇ Export CSV</button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div id="audit-log-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ REPORTS ══ -->
+      <div class="admin-page" id="ap-reports">
+        <div class="stats-grid">
+          <div class="stat-card blue"><div class="label">Degrees Issued</div><div class="value">5</div></div>
+          <div class="stat-card green"><div class="label">Verified</div><div class="value">2</div></div>
+          <div class="stat-card red"><div class="label">Fraud Detected</div><div class="value">1</div></div>
+          <div class="stat-card yellow"><div class="label">Revoked</div><div class="value">1</div></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>📄 Generate System Report</h3></div>
+          <div class="section-body">
+            <div class="form-row">
+              <div class="form-group"><label>Report Type</label>
+                <select id="report-type"><option>Full Audit Report</option><option>Degree Issuance Report</option><option>Fraud Incident Report</option><option>Verification Summary Report</option><option>Smart Contract Execution Report</option></select>
+              </div>
+              <div class="form-group"><label>Date Range</label>
+                <input type="text" placeholder="2024-01-01 to 2024-12-31"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Filter by University</label>
+                <select><option>All Universities</option><option>Iqra University (UNI001)</option><option>FAST-NUCES (UNI002)</option></select>
+              </div>
+              <div class="form-group"><label>Output Format</label>
+                <select><option>Preview (HTML)</option><option>CSV Export</option><option>PDF (Print)</option></select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-primary" onclick="generateReport()">📄 Generate Report</button>
+              <button class="btn btn-outline" onclick="exportLogs()">⬇ Export Audit CSV</button>
+              <button class="btn btn-outline" onclick="exportVerif()">⬇ Export Verifications CSV</button>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>📋 Report Preview</h3></div>
+          <div class="section-body">
+            <div class="report-box" id="report-preview" style="color:var(--muted);font-size:12px">Click "Generate Report" to preview here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SMART CONTRACTS ══ -->
+      <div class="admin-page" id="ap-smart-contracts">
+        <div class="stats-grid">
+          <div class="stat-card green"><div class="label">Active Contracts</div><div class="value">3</div><div class="sub">All deployed & running</div></div>
+          <div class="stat-card blue"><div class="label">Total Executions</div><div class="value">21</div><div class="sub">Across all contracts</div></div>
+          <div class="stat-card yellow"><div class="label">Total Gas Used</div><div class="value" style="font-size:18px">185K</div><div class="sub">Across all transactions</div></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>📝 Deployed Smart Contracts</h3></div>
+          <div class="section-body table-wrap" id="sc-table"></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>⚡ Smart Contract Execution Log</h3></div>
+          <div class="section-body">
+            <div class="sc-log">
+[2024-06-01 10:00] DegreeContract.issueDegree(STU001, BSCS, UNI001) → DEG001 | Gas: 21,000 | Tx: 0xTX001A1B2C3 | ✅ CONFIRMED<br>
+[2024-06-02 11:30] DegreeContract.issueDegree(STU002, BSEE, UNI001) → DEG002 | Gas: 21,000 | Tx: 0xTX002B2C3D4 | ✅ CONFIRMED<br>
+[2023-12-15 09:15] DegreeContract.issueDegree(STU003, BSME, UNI002) → DEG003 | Gas: 21,000 | Tx: 0xTX003C3D4E5 | ✅ CONFIRMED<br>
+[2024-07-20 14:00] DegreeContract.issueDegree(STU001, MSCS, UNI001) → DEG004 | Gas: 21,000 | Tx: 0xTX004D4E5F6 | ✅ CONFIRMED<br>
+[2024-08-01 08:45] DegreeContract.issueDegree(STU002, MBA,  UNI002) → DEG005 | Gas: 21,000 | Tx: 0xTX005E5F6A1 | ✅ CONFIRMED<br>
+[2024-09-01 10:00] VerifyContract.verifyDegree(DEG001, EMP001) → VERIFIED | Gas: 8,500 | Tx: 0xVTX001 | ✅ OK<br>
+[2024-09-03 14:20] VerifyContract.verifyDegree(DEG003, EMP002) → VERIFIED | Gas: 8,500 | Tx: 0xVTX002 | ✅ OK<br>
+[2024-09-04 11:00] DegreeContract.revokeDegree(DEG005, UNI002) → REVOKED  | Gas: 12,000 | Tx: 0xVTX003 | ✅ OK<br>
+[2024-09-05 09:10] VerifyContract.verifyDegree(DEG005, EMP001) → REVOKED  | Gas: 8,500 | Tx: 0xVTX003 | ⚠️ REVOKED<br>
+[2024-09-06 16:45] VerifyContract.verifyDegree(FAKE999, EMP002) → <span style="color:var(--red)">❌ FRAUD_DETECTED — HASH MISMATCH — TX REJECTED</span><br>
+[2024-09-07 02:30] AccessContract.checkAccess(DEG002, UNKNOWN) → <span style="color:var(--red)">❌ UNAUTHORIZED — ACCESS DENIED — IP LOGGED</span>
+            </div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><h3>📄 DegreeContract ABI (Solidity)</h3><button class="btn btn-outline btn-sm" onclick="toggleAbi('abi1')">View ABI</button></div>
+            <div class="section-body">
+              <div class="abi-box" id="abi1">
+// SPDX-License-Identifier: MIT<br>
+pragma solidity ^0.8.0;<br><br>
+contract DegreeContract {<br>
+&nbsp;&nbsp;struct Degree {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;string degreeId;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;string studentId;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;string studentName;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;string program;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;string university;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;uint256 year;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bytes32 degreeHash;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool isRevoked;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;mapping(string => Degree) public degrees;<br><br>
+&nbsp;&nbsp;event DegreeIssued(string degreeId, bytes32 hash);<br>
+&nbsp;&nbsp;event DegreeRevoked(string degreeId);<br><br>
+&nbsp;&nbsp;function issueDegree(...) public onlyUniversity { ... }<br>
+&nbsp;&nbsp;function revokeDegree(string memory id) public onlyUniversity { ... }<br>
+&nbsp;&nbsp;function getDegree(string memory id) public view returns (Degree memory) { ... }<br>
+}
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h3>📄 VerifyContract ABI (Solidity)</h3><button class="btn btn-outline btn-sm" onclick="toggleAbi('abi2')">View ABI</button></div>
+            <div class="section-body">
+              <div class="abi-box" id="abi2">
+// SPDX-License-Identifier: MIT<br>
+pragma solidity ^0.8.0;<br><br>
+contract VerifyContract {<br>
+&nbsp;&nbsp;event DegreeVerified(string degreeId, address employer, bool valid);<br>
+&nbsp;&nbsp;event FraudDetected(string degreeId, address employer);<br><br>
+&nbsp;&nbsp;function verifyDegree(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;string memory degreeId,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bytes32 submittedHash<br>
+&nbsp;&nbsp;) public returns (bool) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Degree memory d = DegreeContract.getDegree(degreeId);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (d.degreeHash != submittedHash) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;emit FraudDetected(degreeId, msg.sender);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return false;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;emit DegreeVerified(degreeId, msg.sender, true);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return true;<br>
+&nbsp;&nbsp;}<br>
+}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MONITORING ══ -->
+      <div class="admin-page" id="ap-monitoring">
+        <div class="stats-grid">
+          <div class="stat-card blue"><div class="label">Degrees Issued (Total)</div><div class="value">5</div><div class="icon-bg">📜</div></div>
+          <div class="stat-card green"><div class="label">Verification Requests</div><div class="value">4</div><div class="icon-bg">🔍</div></div>
+          <div class="stat-card yellow"><div class="label">Avg TX Confirmation</div><div class="value" style="font-size:20px">1.2s</div><div class="icon-bg">⚡</div></div>
+          <div class="stat-card red"><div class="label">Unauthorized Attempts</div><div class="value">2</div><div class="icon-bg">🔒</div></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>⚡ Live Monitoring Metrics</h3></div>
+          <div class="section-body">
+            <div class="metric-row">
+              <div class="mini-stat"><div class="ml">Block Height</div><div class="mv" style="color:var(--accent)">18,204</div></div>
+              <div class="mini-stat"><div class="ml">TX/min</div><div class="mv" style="color:var(--green)">2.4</div></div>
+              <div class="mini-stat"><div class="ml">Network Peers</div><div class="mv" style="color:var(--accent2)">4/4</div></div>
+              <div class="mini-stat"><div class="ml">Uptime</div><div class="mv" style="color:var(--green)">99.9%</div></div>
+              <div class="mini-stat"><div class="ml">Gas (avg)</div><div class="mv" style="color:var(--yellow)">18,200</div></div>
+              <div class="mini-stat"><div class="ml">Fraud Alerts</div><div class="mv" style="color:var(--red)">1</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>📋 Smart Contract Execution Summary</h3></div>
+          <div class="section-body table-wrap">
+            <table>
+              <thead><tr><th>Contract</th><th>Function</th><th>Calls</th><th>Avg Gas</th><th>Success Rate</th><th>Last Execution</th></tr></thead>
+              <tbody>
+                <tr><td><strong>DegreeContract</strong></td><td class="mono">issueDegree()</td><td>5</td><td class="mono">21,000</td><td><span class="badge badge-green">100%</span></td><td class="mono">2024-08-01</td></tr>
+                <tr><td><strong>DegreeContract</strong></td><td class="mono">revokeDegree()</td><td>1</td><td class="mono">12,000</td><td><span class="badge badge-green">100%</span></td><td class="mono">2024-09-04</td></tr>
+                <tr><td><strong>VerifyContract</strong></td><td class="mono">verifyDegree()</td><td>4</td><td class="mono">8,500</td><td><span class="badge badge-yellow">75%</span></td><td class="mono">2024-09-06</td></tr>
+                <tr><td><strong>AccessContract</strong></td><td class="mono">checkAccess()</td><td>12</td><td class="mono">4,200</td><td><span class="badge badge-green">92%</span></td><td class="mono">2024-09-07</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SETTINGS ══ -->
+      <div class="admin-page" id="ap-settings">
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><h3>⛓️ Blockchain Configuration</h3></div>
+            <div class="section-body">
+              <div class="form-group"><label>Network Type</label>
+                <select><option>Private (Hyperledger Fabric)</option><option>Private (Ethereum)</option><option>Permissioned PoA</option></select>
+              </div>
+              <div class="form-group"><label>Consensus Mechanism</label>
+                <select><option>PBFT</option><option>Raft</option><option>PoA</option><option>Clique PoA</option></select>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Block Time (seconds)</label><input type="number" value="5"/></div>
+                <div class="form-group"><label>Max TX per Block</label><input type="number" value="100"/></div>
+              </div>
+              <div class="form-group"><label>Hashing Algorithm</label>
+                <select><option>SHA-256</option><option>Keccak-256</option><option>SHA-3</option></select>
+              </div>
+              <button class="btn btn-primary">Save Blockchain Config</button>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h3>🔐 Access Controls (RBAC)</h3></div>
+            <div class="section-body">
+              <div class="control-row"><div class="ctrl-info"><strong>Allow University Self-Registration</strong><span>Let new universities register without admin approval</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="control-row"><div class="ctrl-info"><strong>Require Admin Approval for Degrees</strong><span>All degree issuances require admin sign-off</span></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+              <div class="control-row"><div class="ctrl-info"><strong>Fraud Auto-Block</strong><span>Auto-block employer after 3 fraud attempts</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="control-row"><div class="ctrl-info"><strong>Email Alerts on Fraud</strong><span>Notify admin immediately on fraud detection</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="control-row"><div class="ctrl-info"><strong>Student Consent Required</strong><span>Employers need student approval to verify</span></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+              <button class="btn btn-primary" style="margin-top:14px">Save Access Config</button>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>🔴 Danger Zone</h3></div>
+          <div class="section-body">
+            <div class="alert alert-danger" style="margin-bottom:14px">⚠️ These actions are irreversible or affect the entire system. Proceed with extreme caution.</div>
+            <div class="danger-zone">
+              <button class="btn btn-danger" onclick="confirmAction('Reset all user permissions?')">🔄 Reset All Permissions</button>
+              <button class="btn btn-danger" onclick="confirmAction('Purge all test data from blockchain?')">🗑️ Purge Test Data</button>
+              <button class="btn btn-danger" onclick="confirmAction('Re-deploy all smart contracts?')">⛓️ Re-deploy Contracts</button>
+              <button class="btn btn-danger" onclick="confirmAction('Revoke all employer verifier roles?')">🚫 Revoke Employer Access</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <h2>➕ Add New User</h2>
+    <div class="form-group"><label>Role</label><select><option>Student</option><option>University</option><option>Employer</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Full Name / Organization</label><input type="text" placeholder="Name"/></div>
+      <div class="form-group"><label>ID / Registration No.</label><input type="text" placeholder="e.g. 68597"/></div>
+    </div>
+    <div class="form-group"><label>Email</label><input type="email" placeholder="email@example.com"/></div>
+    <div class="form-group"><label>Wallet Address (auto-generated)</label><input type="text" placeholder="0x..." style="font-family:var(--font-mono);font-size:12px"/></div>
+    <div class="form-group"><label>University (if Student)</label><select><option>— Select —</option><option>Iqra University (UNI001)</option><option>FAST-NUCES (UNI002)</option></select></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAdminModal('addUserModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeAdminModal('addUserModal');alert('✅ User added!\nIdentity certificate issued on blockchain.\nWallet address generated.')">Add to Blockchain</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add University Modal -->
+<div class="modal-overlay" id="addUniModal">
+  <div class="modal">
+    <h2>🏛️ Register University</h2>
+    <div class="form-row">
+      <div class="form-group"><label>University Name</label><input type="text"/></div>
+      <div class="form-group"><label>University ID</label><input type="text" placeholder="UNI003"/></div>
+    </div>
+    <div class="form-group"><label>Contact Email</label><input type="email"/></div>
+    <div class="form-group"><label>Accreditation Number</label><input type="text"/></div>
+    <div class="form-group"><label>Blockchain Wallet Address</label><input type="text" placeholder="0x..."/></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAdminModal('addUniModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeAdminModal('addUniModal');alert('✅ University registered!\nCertificate authority assigned on blockchain.')">Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Employer Modal -->
+<div class="modal-overlay" id="addEmpModal">
+  <div class="modal">
+    <h2>🏢 Add Employer</h2>
+    <div class="form-row">
+      <div class="form-group"><label>Company Name</label><input type="text"/></div>
+      <div class="form-group"><label>Employer ID</label><input type="text" placeholder="EMP003"/></div>
+    </div>
+    <div class="form-group"><label>HR Contact Email</label><input type="email"/></div>
+    <div class="form-group"><label>Industry</label><select><option>Technology</option><option>Finance</option><option>Healthcare</option><option>Education</option><option>Other</option></select></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAdminModal('addEmpModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeAdminModal('addEmpModal');alert('✅ Employer registered & verification access granted.')">Add Employer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Issue Degree Modal -->
+<div class="modal-overlay" id="issueDegreeModal">
+  <div class="modal">
+    <h2>📜 Issue New Degree</h2>
+    <div class="form-row">
+      <div class="form-group"><label>Student</label>
+        <select>
+          <option>STU001 — Muhammad Hassan Shahzad (68597)</option>
+          <option>STU002 — Sara Khan</option>
+          <option>STU003 — Omar Farooq</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Issuing University</label>
+        <select><option>UNI001 — Iqra University</option><option>UNI002 — FAST-NUCES</option></select>
+      </div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group"><label>Program</label>
+        <select><option>BSCS</option><option>BSEE</option><option>MSCS</option><option>MBA</option><option>BSME</option></select>
+      </div>
+      <div class="form-group"><label>Graduation Year</label><input type="text" placeholder="2024"/></div>
+      <div class="form-group"><label>CGPA</label><input type="text" placeholder="3.85"/></div>
+    </div>
+    <div class="alert alert-info" style="margin-top:8px">🔗 A unique SHA-256 hash will be generated and stored immutably on the blockchain.</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAdminModal('issueDegreeModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeAdminModal('issueDegreeModal');alert('✅ Degree issued on blockchain!\nHash generated & stored immutably.\nAudit log entry created.')">Issue on Blockchain</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  let allDegrees = [...BLOCKCHAIN_DATA.degrees];
+
+  function adminPage(id, el) {
+    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('ap-' + id).classList.add('active');
+    const titles = { dashboard:'System Overview', analytics:'Analytics', universities:'Universities', students:'Students', employers:'Employers', degrees:'All Degrees', verifications:'Verifications', fraud:'Fraud & Alerts', audit:'Audit Logs', reports:'Reports', 'smart-contracts':'Smart Contracts', monitoring:'Monitoring', settings:'System Settings' };
+    document.getElementById('admin-page-title').textContent = titles[id] || id;
+    if (el) el.classList.add('active');
+    renderPageData(id);
+  }
+
+  function showAdminModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeAdminModal(id) { document.getElementById(id).classList.remove('open'); }
+  function confirmAction(msg) { if(confirm(msg + '\n\nThis action cannot be undone.')) alert('✅ Action executed and logged to audit trail.'); }
+  function blockEmployer() { if(confirm('Block EMP002 (FinanceHub Inc) from all future verifications?')) alert('✅ EMP002 blocked. All verification requests from this employer will be rejected.'); }
+  function toggleAbi(id) { document.getElementById(id).classList.toggle('show'); }
+
+  function renderPageData(id) {
+    const map = { dashboard: renderDashboard, universities: renderUniTable, students: renderStudentsTable, employers: renderEmployersTable, degrees: renderDegreesTable, verifications: renderVerifTable, audit: ()=>renderAuditLogs(''), fraud: renderFraudTable, 'smart-contracts': renderSCTable };
+    if (map[id]) map[id]();
+  }
+
+  function renderDashboard() {
+    const el = document.getElementById('admin-recent-logs');
+    if (el) el.innerHTML = BLOCKCHAIN_DATA.auditLogs.slice(-6).reverse().map(l=>`
+      <div class="log-item">
+        <div class="log-dot ${l.status}"></div>
+        <div class="log-info" style="flex:1">
+          <div class="action">${l.action.replace(/_/g,' ')}</div>
+          <div class="meta">${l.actor} → ${l.target} · ${l.timestamp} · ${l.txTime}</div>
+        </div>
+        <span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}">${l.status}</span>
+      </div>`).join('');
+
+    const uel = document.getElementById('admin-uni-summary');
+    if (uel) uel.innerHTML = BLOCKCHAIN_DATA.universities.map(u=>`
+      <div class="user-row">
+        <div class="user-avatar ua-blue">${u.name[0]}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">${u.name}</div>
+          <div style="font-size:11px;color:var(--muted)">${u.id} · ${u.degreesIssued} degrees · ${u.contact}</div>
+        </div>
+        <span class="badge badge-green">Verified</span>
+      </div>`).join('');
+
+    const eel = document.getElementById('admin-emp-summary');
+    if (eel) eel.innerHTML = BLOCKCHAIN_DATA.employers.map(e=>`
+      <div class="user-row">
+        <div class="user-avatar ua-yellow">${e.name[0]}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">${e.name}</div>
+          <div style="font-size:11px;color:var(--muted)">${e.id} · ${e.verifications} verifications · ${e.email}</div>
+        </div>
+        <span class="badge badge-green">Verified</span>
+      </div>`).join('');
+  }
+
+  function renderUniTable() {
+    const el = document.getElementById('uni-table-container');
+    if (!el) return;
+    el.innerHTML = `<table><thead><tr><th>ID</th><th>Name</th><th>Contact</th><th>Blockchain Address</th><th>Degrees Issued</th><th>Status</th><th>Actions</th></tr></thead><tbody>` +
+      BLOCKCHAIN_DATA.universities.map(u=>`<tr>
+        <td class="mono">${u.id}</td><td><strong>${u.name}</strong></td><td>${u.contact}</td>
+        <td class="mono">${u.address}</td><td><span class="badge badge-blue">${u.degreesIssued}</span></td>
+        <td><span class="badge badge-green">Active</span></td>
+        <td><button class="btn btn-outline btn-sm">Edit</button> <button class="btn btn-danger btn-sm">Revoke</button></td>
+      </tr>`).join('') + `</tbody></table>`;
+  }
+
+  function renderStudentsTable() {
+    const el = document.getElementById('students-table-container');
+    if (!el) return;
+    el.innerHTML = `<table><thead><tr><th>Roll No.</th><th>Name</th><th>Student ID</th><th>Email</th><th>University</th><th>Enrolled</th><th>Wallet</th><th>Actions</th></tr></thead><tbody>` +
+      BLOCKCHAIN_DATA.students.map(s=>`<tr>
+        <td class="mono">${s.id}</td><td><strong>${s.name}</strong></td>
+        <td>${s.id==='STU001'?'<strong style="color:var(--accent)">68597</strong>':'—'}</td>
+        <td>${s.email}</td><td>${getUniName(s.uniId)}</td><td>${s.enrolled}</td>
+        <td class="mono">${s.wallet}</td>
+        <td><button class="btn btn-outline btn-sm">View</button> <button class="btn btn-danger btn-sm">Suspend</button></td>
+      </tr>`).join('') + `</tbody></table>`;
+  }
+
+  function renderEmployersTable() {
+    const el = document.getElementById('employers-table-container');
+    if (!el) return;
+    el.innerHTML = `<table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Verifications</th><th>Status</th><th>Actions</th></tr></thead><tbody>` +
+      BLOCKCHAIN_DATA.employers.map(e=>`<tr>
+        <td class="mono">${e.id}</td><td><strong>${e.name}</strong></td><td>${e.email}</td>
+        <td><span class="badge badge-blue">${e.verifications}</span></td>
+        <td><span class="badge badge-green">Active</span></td>
+        <td><button class="btn btn-outline btn-sm">View</button> <button class="btn btn-danger btn-sm">Block</button></td>
+      </tr>`).join('') + `</tbody></table>`;
+  }
+
+  function renderDegreesTable(data) {
+    const el = document.getElementById('degrees-table-container');
+    if (!el) return;
+    const rows = (data||allDegrees).map(d=>`<tr>
+      <td class="mono">${d.id}</td>
+      <td><strong>${getStudentName(d.studentId)}</strong>${d.studentId==='STU001'?' <span class="badge badge-blue" style="font-size:9px">68597</span>':''}</td>
+      <td>${getUniName(d.uniId)}</td><td>${d.program}</td><td>${d.year}</td>
+      <td class="mono">${d.cgpa}</td>
+      <td class="mono" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${d.hash}">${d.hash.substring(0,24)}...</td>
+      <td class="mono">${d.timestamp.split(' ')[0]}</td>
+      <td><span class="badge ${d.status==='valid'?'badge-green':'badge-red'}">${d.status.toUpperCase()}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline btn-sm">View</button>
+        ${d.status==='valid'?`<button class="btn btn-danger btn-sm" onclick="revokeDegree('${d.id}')">Revoke</button>`:''}
+      </td>
+    </tr>`).join('');
+    el.innerHTML = `<table><thead><tr><th>ID</th><th>Student</th><th>University</th><th>Program</th><th>Year</th><th>CGPA</th><th>Hash</th><th>Issued</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function filterDegrees() {
+    const q = document.getElementById('deg-search').value.toLowerCase();
+    const sf = document.getElementById('deg-status-filter').value;
+    const filtered = allDegrees.filter(d =>
+      (!q || d.id.toLowerCase().includes(q) || getStudentName(d.studentId).toLowerCase().includes(q) || d.program.toLowerCase().includes(q) || getUniName(d.uniId).toLowerCase().includes(q)) &&
+      (!sf || d.status === sf)
+    );
+    renderDegreesTable(filtered);
+  }
+
+  function revokeDegree(id) {
+    if (confirm('Revoke degree ' + id + ' on blockchain? This is irreversible.')) {
+      allDegrees = allDegrees.map(d => d.id===id ? {...d, status:'revoked'} : d);
+      renderDegreesTable();
+      alert('✅ Degree ' + id + ' revoked.\nTransaction written to blockchain.\nAudit log entry created.');
+    }
+  }
+
+  function renderVerifTable() {
+    const el = document.getElementById('verif-table-container');
+    if (!el) return;
+    el.innerHTML = `<table><thead><tr><th>ID</th><th>Degree ID</th><th>Student</th><th>Employer</th><th>Result</th><th>Response Time</th><th>Timestamp</th><th>Tx Hash</th><th>Note</th></tr></thead><tbody>` +
+      BLOCKCHAIN_DATA.verifications.map(v => {
+        const deg = BLOCKCHAIN_DATA.degrees.find(d=>d.id===v.degreeId);
+        return `<tr>
+          <td class="mono">${v.id}</td><td class="mono">${v.degreeId}</td>
+          <td>${deg ? getStudentName(deg.studentId) : '<span style="color:var(--red)">UNKNOWN</span>'}</td>
+          <td>${getEmpName(v.empId)}</td>
+          <td><span class="badge ${v.result==='verified'?'badge-green':v.result==='fraud'?'badge-red':'badge-yellow'}">${v.result.toUpperCase()}</span></td>
+          <td class="mono">${v.responseTime||'—'}</td>
+          <td class="mono">${v.timestamp}</td><td class="mono">${v.txHash}</td>
+          <td style="font-size:11px;color:var(--muted);max-width:160px">${v.note||'—'}</td>
+        </tr>`;
+      }).join('') + `</tbody></table>`;
+  }
+
+  function renderAuditLogs(filter, statusFilter) {
+    const el = document.getElementById('audit-log-list');
+    if (!el) return;
+    let logs = BLOCKCHAIN_DATA.auditLogs;
+    if (filter) logs = logs.filter(l => l.action === filter);
+    if (statusFilter) logs = logs.filter(l => l.status === statusFilter);
+    el.innerHTML = logs.map(l => `
+      <div class="log-item">
+        <div class="log-dot ${l.status}"></div>
+        <div class="log-info" style="flex:1">
+          <div class="action">${l.action.replace(/_/g,' ')} <span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}">${l.status}</span></div>
+          <div class="meta">Actor: ${l.actor} · Target: ${l.target} · ${l.timestamp} · TX Time: ${l.txTime}</div>
+        </div>
+        <span class="mono" style="font-size:10px;flex-shrink:0">${l.id}</span>
+      </div>`).join('');
+  }
+
+  function filterLogs() {
+    const f = document.getElementById('log-filter').value;
+    const sf = document.getElementById('log-status-filter').value;
+    renderAuditLogs(f, sf);
+  }
+
+  function renderFraudTable() {
+    const el = document.getElementById('fraud-table-body');
+    if (!el) return;
+    const securityLogs = BLOCKCHAIN_DATA.auditLogs.filter(l => ['FRAUD_DETECTED','UNAUTHORIZED_ACCESS','VERIFICATION_FAIL'].includes(l.action));
+    el.innerHTML = securityLogs.map(l => `<tr>
+      <td class="mono">${l.id}</td>
+      <td><span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}">${l.action.replace(/_/g,' ')}</span></td>
+      <td>${l.actor}</td><td class="mono">${l.target}</td><td class="mono">${l.timestamp}</td>
+      <td class="mono">${l.txTime}</td>
+      <td><span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}">${l.status}</span></td>
+    </tr>`).join('');
+  }
+
+  function renderSCTable() {
+    const el = document.getElementById('sc-table');
+    if (!el) return;
+    el.innerHTML = `<table><thead><tr><th>Contract</th><th>Address</th><th>Purpose</th><th>Total Calls</th><th>Status</th><th>Last TX</th><th>Actions</th></tr></thead><tbody>` +
+      BLOCKCHAIN_DATA.smartContracts.map(c => `<tr>
+        <td><strong>${c.name}</strong></td><td class="mono">${c.address}</td>
+        <td>${c.purpose}</td>
+        <td><span class="badge badge-blue">${c.totalCalls}</span></td>
+        <td><span class="badge badge-green">ACTIVE</span></td>
+        <td class="mono">${c.lastTx}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="toggleAbi('abi${c.name[0]}')">View ABI</button></td>
+      </tr>`).join('') + `</tbody></table>`;
+  }
+
+  function exportLogs() {
+    const rows = ['ID,Action,Actor,Target,Timestamp,TX Time,Status',
+      ...BLOCKCHAIN_DATA.auditLogs.map(l => `${l.id},${l.action},${l.actor},${l.target},${l.timestamp},${l.txTime},${l.status}`)
+    ].join('\n');
+    const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows); a.download='audit_log.csv'; a.click();
+  }
+
+  function exportVerif() {
+    const rows = ['ID,Degree ID,Employer,Result,Response Time,Timestamp,Tx Hash,Note',
+      ...BLOCKCHAIN_DATA.verifications.map(v => `${v.id},${v.degreeId},${getEmpName(v.empId)},${v.result},${v.responseTime||'—'},${v.timestamp},${v.txHash},${v.note||''}`)
+    ].join('\n');
+    const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows); a.download='verifications.csv'; a.click();
+  }
+
+  function generateReport() {
+    const type = document.getElementById('report-type').value;
+    const el = document.getElementById('report-preview');
+    el.innerHTML = `<pre style="white-space:pre-wrap;font-family:var(--font-mono);font-size:12px;color:var(--text2)">
+╔══════════════════════════════════════════════════════════════════╗
+║     BLOCKDEGREE — BLOCKCHAIN DEGREE ATTESTATION SYSTEM          ║
+║     ${type.toUpperCase().padEnd(55)}║
+║     Iqra University · Faculty of Engineering Sciences           ║
+║     Generated: ${new Date().toLocaleString().padEnd(49)}║
+╚══════════════════════════════════════════════════════════════════╝
+
+SYSTEM CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Blockchain Type    : Private (Hyperledger Fabric)
+  Consensus          : PBFT
+  Hashing Algorithm  : SHA-256
+  Block Time         : 5 seconds
+  Network Peers      : 4/4 active
+  System Uptime      : 99.9%
+
+PARTICIPANTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Universities    : 2  (Iqra University, FAST-NUCES)
+  Students        : 3  (incl. Muhammad Hassan Shahzad · 68597)
+  Employers       : 2  (TechCorp Ltd, FinanceHub Inc)
+
+DEGREE ISSUANCE SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total Issued        : 5
+  Currently Valid     : 4
+  Revoked             : 1 (DEG005 — MBA · FAST-NUCES)
+  Iqra University     : 3 degrees (DEG001, DEG002, DEG004)
+  FAST-NUCES          : 2 degrees (DEG003, DEG005)
+  Programs            : BSCS, BSEE, BSME, MSCS, MBA
+
+VERIFICATION SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total Requests      : 4
+  Verified            : 2 (DEG001 ✅, DEG003 ✅)
+  Revoked Found       : 1 (DEG005 ⚠️)
+  Fraud Detected      : 1 (FAKE999 ❌)
+  Avg Response Time   : 1.0 seconds
+
+SECURITY INCIDENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  [2024-09-06 16:45] FRAUD_DETECTED   · EMP002 → FAKE999 · LOG010
+  [2024-09-07 02:30] UNAUTHORIZED_ACCESS · UNKNOWN → DEG002 · LOG011
+
+SMART CONTRACT EXECUTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  DegreeContract.issueDegree()    : 5 calls · 100% success
+  DegreeContract.revokeDegree()   : 1 call  · 100% success
+  VerifyContract.verifyDegree()   : 4 calls · 75% clean (1 fraud, 1 revoked)
+  AccessContract.checkAccess()    : 12 calls · 92% authorized
+
+─────────────────────────────────────────────────────────────────
+  Report generated by BlockDegree Admin System
+  Author: Muhammad Hassan Shahzad · Student ID: 68597
+  Blockchain Security CCP · Iqra University
+─────────────────────────────────────────────────────────────────
+</pre>`;
+  }
+
+  // Init
+  renderDashboard();
+</script>
+</body>
+</html>

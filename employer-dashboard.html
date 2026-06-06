@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employer Dashboard — BlockDegree</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .result-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-top: 16px; display: none; }
+    .result-card.show { display: block; animation: fadeIn .2s ease; }
+    .result-card.ok   { border-color: rgba(16,185,129,.4); background: rgba(16,185,129,.05); }
+    .result-card.fail { border-color: rgba(239,68,68,.4);  background: rgba(239,68,68,.05); }
+    .result-card.warn { border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.05); }
+    .result-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; }
+    .result-row:last-child { border-bottom:none; }
+    .result-row .rk { color:var(--muted); font-size:12px; }
+    .fraud-box { background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.3); border-radius:10px; padding:20px; }
+    .case-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:12px; }
+    .case-num { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:var(--accent2); color:#fff; font-size:11px; font-weight:700; margin-right:8px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏢</div>
+      <h2>BlockDegree</h2>
+      <p>Employer Portal</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-item active" onclick="showPage('overview',this)"><span class="icon">🏠</span> Dashboard</a>
+      <a class="nav-item" onclick="showPage('verify',this)"><span class="icon">🔍</span> Verify Degree</a>
+      <a class="nav-item" onclick="showPage('batch-verify',this)"><span class="icon">📦</span> Batch Verify</a>
+      <a class="nav-item" onclick="showPage('verif-history',this)"><span class="icon">📋</span> My Verifications</a>
+      <a class="nav-item" onclick="showPage('fraud-log',this)"><span class="icon">🚨</span> Fraud Alerts<span class="nav-badge">1</span></a>
+      <a class="nav-item" onclick="showPage('simulation',this)"><span class="icon">🧪</span> Simulation Cases</a>
+      <div class="nav-section-label">Account</div>
+      <a class="nav-item" onclick="showPage('profile',this)"><span class="icon">🏢</span> Company Profile</a>
+      <a class="nav-item" onclick="showPage('settings',this)"><span class="icon">⚙️</span> Settings</a>
+      <div class="nav-section-label">Navigation</div>
+      <a class="nav-item" href="user-dashboard.html"><span class="icon">🎓</span> Student Portal</a>
+      <a class="nav-item" href="admin-dashboard.html"><span class="icon">🛡️</span> Admin Panel</a>
+      <a class="nav-item" href="index.html"><span class="icon">↩️</span> Home</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar" style="background:linear-gradient(135deg,#059669,#10b981)">TC</div>
+      <div>
+        <div class="footer-name">TechCorp Ltd</div>
+        <div class="footer-role" style="color:var(--green)">● Verified Employer</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;color:var(--text);font-size:18px;cursor:pointer">☰</button>
+        <h1 id="page-title">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="chain-status"><div class="dot"></div> Chain Online</div>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">Block #18,204</span>
+        <span class="topbar-badge">1 FRAUD ALERT</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ OVERVIEW ══ -->
+      <div class="page active" id="page-overview">
+        <div class="alert alert-info">ℹ️ You are logged in as <strong>TechCorp Ltd (EMP001)</strong>. All verifications are tamper-proof and recorded on the private blockchain.</div>
+        <div class="stats-grid">
+          <div class="stat-card green">
+            <div class="label">Verified Degrees</div><div class="value">2</div>
+            <div class="sub">Authenticated on-chain</div><div class="icon-bg">✅</div>
+          </div>
+          <div class="stat-card red">
+            <div class="label">Fraud Detected</div><div class="value">1</div>
+            <div class="sub">Fake degree attempts</div><div class="icon-bg">🚨</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="label">Revoked Found</div><div class="value">1</div>
+            <div class="sub">Revoked degrees checked</div><div class="icon-bg">🚫</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="label">Avg Response Time</div><div class="value" style="font-size:20px">1.1s</div>
+            <div class="sub">Blockchain verification speed</div><div class="icon-bg">⚡</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><h3>🔍 Quick Degree Verification</h3></div>
+            <div class="section-body">
+              <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Enter a degree hash or degree ID to instantly verify against blockchain records. Try: <code style="color:var(--accent)">DEG001</code>, <code style="color:var(--yellow)">DEG005</code>, or <code style="color:var(--red)">FAKE999</code></p>
+              <div class="form-group">
+                <label>Degree Hash or Degree ID</label>
+                <input type="text" id="quick-input" placeholder="e.g. DEG001 or 0xDEG001HASH..." onkeydown="if(event.key==='Enter')quickVerify()" />
+              </div>
+              <button class="btn btn-primary" onclick="quickVerify()">⛓️ Verify on Blockchain</button>
+              <div class="result-card" id="quick-result"></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h3>📊 My Verification Summary</h3></div>
+            <div class="section-body" id="emp-verif-summary"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VERIFY ══ -->
+      <div class="page" id="page-verify">
+        <div class="section">
+          <div class="section-header"><h3>⛓️ Degree Verification Engine</h3></div>
+          <div class="section-body">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Submit a degree hash or ID to verify against the private blockchain. The smart contract computes and compares hashes — tamper-proof, instant, no intermediary needed.</p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Degree Hash / ID</label>
+                <input type="text" id="verify-input" placeholder="0xDEG001HASH... or DEG001"/>
+              </div>
+              <div class="form-group">
+                <label>Your Employer ID</label>
+                <input type="text" id="verify-emp" value="EMP001" readonly style="color:var(--accent);font-family:var(--font-mono)"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Applicant Name (Optional — for audit record)</label>
+              <input type="text" placeholder="e.g. Muhammad Hassan Shahzad"/>
+            </div>
+            <button class="btn btn-primary" onclick="runVerification()">⛓️ Verify on Blockchain</button>
+            <button class="btn btn-outline" style="margin-left:8px" onclick="document.getElementById('verify-input').value='';document.getElementById('full-result').className='result-card'">🔄 Clear</button>
+            <div class="result-card" id="full-result"></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>🔎 How Verification Works</h3></div>
+          <div class="section-body">
+            <div class="progress-step">
+              <div class="step-num done">1</div>
+              <div><strong>Submit Degree Hash / ID</strong><br><span style="font-size:12px;color:var(--muted)">You provide the hash or ID the applicant gave you.</span></div>
+            </div>
+            <div class="progress-step">
+              <div class="step-num done">2</div>
+              <div><strong>Smart Contract Lookup</strong><br><span style="font-size:12px;color:var(--muted)">VerifyContract.verifyDegree() queries the blockchain ledger by hash.</span></div>
+            </div>
+            <div class="progress-step">
+              <div class="step-num done">3</div>
+              <div><strong>Hash Comparison</strong><br><span style="font-size:12px;color:var(--muted)">Submitted data is hashed and compared to the on-chain stored hash using SHA-256.</span></div>
+            </div>
+            <div class="progress-step">
+              <div class="step-num">4</div>
+              <div><strong>Result + Audit Log</strong><br><span style="font-size:12px;color:var(--muted)">VERIFIED / REVOKED / FRAUD result returned. Transaction logged immutably.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BATCH VERIFY ══ -->
+      <div class="page" id="page-batch-verify">
+        <div class="section">
+          <div class="section-header"><h3>📦 Batch Degree Verification</h3></div>
+          <div class="section-body">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Enter multiple degree IDs (one per line) to verify all at once. Ideal for bulk hiring verification.</p>
+            <div class="form-group">
+              <label>Degree IDs / Hashes (one per line)</label>
+              <textarea id="batch-input" rows="6" placeholder="DEG001&#10;DEG003&#10;FAKE999&#10;DEG005"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="runBatch()">⛓️ Batch Verify All</button>
+            <div id="batch-results" style="margin-top:16px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VERIFICATION HISTORY ══ -->
+      <div class="page" id="page-verif-history">
+        <div class="section">
+          <div class="section-header"><h3>📋 My Verification History</h3><button class="btn btn-outline btn-sm" onclick="exportVerifHistory()">⬇ Export CSV</button></div>
+          <div class="section-body table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Degree ID</th><th>Student</th><th>Program</th><th>University</th><th>Result</th><th>Response Time</th><th>Timestamp</th><th>Tx Hash</th></tr></thead>
+              <tbody id="full-verif-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ FRAUD LOG ══ -->
+      <div class="page" id="page-fraud-log">
+        <div class="alert alert-danger">🚨 1 fraud attempt detected in your verification history. All attempts are permanently logged on blockchain.</div>
+        <div class="fraud-box" style="margin-bottom:20px">
+          <h4 style="color:var(--red);font-size:14px;margin-bottom:10px">🚨 FRAUD DETECTED — Degree FAKE999</h4>
+          <div style="font-size:13px;margin-bottom:10px">On <strong>2024-09-06 16:45</strong>, you attempted to verify degree ID <code>FAKE999</code>. The smart contract's <code>verifyDegree()</code> function found <strong>no matching record</strong> on the blockchain.</div>
+          <div class="result-row"><span class="rk">Submitted Hash</span><span class="mono">0xFAKEHASH999_TAMPERED_DATA_XYZ...</span></div>
+          <div class="result-row"><span class="rk">Blockchain Match</span><span style="color:var(--red);font-weight:600">NOT FOUND</span></div>
+          <div class="result-row"><span class="rk">Smart Contract Event</span><span style="color:var(--red)">FRAUD_DETECTED emitted</span></div>
+          <div class="result-row"><span class="rk">Audit Log Entry</span><span class="mono">LOG010</span></div>
+          <div class="result-row"><span class="rk">Action Taken</span><span style="color:var(--yellow)">Transaction rejected, IP logged, admin notified</span></div>
+          <div style="margin-top:14px">
+            <div class="hash">Tx Hash: 0xVTX004I4D5E6F7...</div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>ℹ️ What Happens on Fraud Detection</h3></div>
+          <div class="section-body">
+            <div class="progress-step">
+              <div class="step-num" style="background:var(--red);color:#fff">!</div>
+              <div><strong>Hash Mismatch Detected</strong><br><span style="font-size:12px;color:var(--muted)">The smart contract finds no blockchain record matching the submitted degree data.</span></div>
+            </div>
+            <div class="progress-step">
+              <div class="step-num" style="background:var(--red);color:#fff">!</div>
+              <div><strong>FRAUD_DETECTED Event Emitted</strong><br><span style="font-size:12px;color:var(--muted)">The contract emits a FRAUD_DETECTED event. Transaction is rejected and NOT written to chain.</span></div>
+            </div>
+            <div class="progress-step">
+              <div class="step-num" style="background:var(--yellow);color:#000">!</div>
+              <div><strong>Audit Log Updated</strong><br><span style="font-size:12px;color:var(--muted)">An immutable audit entry is created: actor, target, timestamp, and IP are all recorded.</span></div>
+            </div>
+            <div class="progress-step">
+              <div class="step-num pending">4</div>
+              <div><strong>Admin Notified</strong><br><span style="font-size:12px;color:var(--muted)">System administrator receives an alert. After 3 attempts, employer is auto-blocked.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SIMULATION ══ -->
+      <div class="page" id="page-simulation">
+        <div class="alert alert-info">🧪 These are the 4 pre-loaded simulation cases per the CCP requirements: 3 real degrees + 1 fake degree attempt.</div>
+        <div id="simulation-cases"></div>
+        <div class="section">
+          <div class="section-header"><h3>📊 Simulation Summary</h3></div>
+          <div class="section-body">
+            <div class="bar-h"><div class="label">Verified</div><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><div class="val">2</div></div>
+            <div class="bar-h"><div class="label">Revoked</div><div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--yellow)"></div></div><div class="val">1</div></div>
+            <div class="bar-h"><div class="label">Fraud Detected</div><div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--red)"></div></div><div class="val">1</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PROFILE ══ -->
+      <div class="page" id="page-profile">
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><h3>🏢 Company Profile</h3></div>
+            <div class="section-body">
+              <div class="form-group"><label>Company Name</label><input type="text" value="TechCorp Ltd"/></div>
+              <div class="form-group"><label>Employer ID</label><input type="text" value="EMP001" readonly style="color:var(--accent)"/></div>
+              <div class="form-group"><label>HR Contact Email</label><input type="text" value="hr@techcorp.com"/></div>
+              <div class="form-group"><label>Verification Wallet</label><input type="text" value="0xEMP001TECHCORP..." readonly style="color:var(--accent);font-family:var(--font-mono);font-size:12px"/></div>
+              <div style="margin-bottom:14px"><span class="badge badge-green">✅ Verified Employer on Blockchain</span></div>
+              <button class="btn btn-primary">Save Changes</button>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h3>📊 Verification Statistics</h3></div>
+            <div class="section-body">
+              <div class="metric-row">
+                <div class="mini-stat"><div class="ml">Total</div><div class="mv" style="color:var(--accent)">4</div></div>
+                <div class="mini-stat"><div class="ml">Verified</div><div class="mv" style="color:var(--green)">2</div></div>
+                <div class="mini-stat"><div class="ml">Revoked</div><div class="mv" style="color:var(--yellow)">1</div></div>
+                <div class="mini-stat"><div class="ml">Fraud</div><div class="mv" style="color:var(--red)">1</div></div>
+              </div>
+              <div class="bar-h"><div class="label">Success Rate</div><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><div class="val">50%</div></div>
+              <div class="bar-h"><div class="label">Avg Resp. Time</div><div class="bar-track"><div class="bar-fill" style="width:55%"></div></div><div class="val">1.1s</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SETTINGS ══ -->
+      <div class="page" id="page-settings">
+        <div class="section">
+          <div class="section-header"><h3>⚙️ Verification Settings</h3></div>
+          <div class="section-body">
+            <div class="control-row"><div class="ctrl-info"><strong>Auto-log All Verifications</strong><span>Record every query to blockchain audit log</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="control-row"><div class="ctrl-info"><strong>Email on Fraud Detection</strong><span>Notify HR immediately on fraud attempt</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="control-row"><div class="ctrl-info"><strong>Require Applicant Consent</strong><span>Student must approve before degree is verified</span></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="control-row"><div class="ctrl-info"><strong>Batch Verification Enabled</strong><span>Allow verifying multiple degrees at once</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <button class="btn btn-primary" style="margin-top:14px">Save Settings</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  function showPage(id, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('page-title').textContent = id.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    if (el) el.classList.add('active');
+  }
+
+  function buildResultCard(el, deg, mode) {
+    if (mode === 'fail') {
+      el.className = 'result-card show fail';
+      el.innerHTML = `<div style="color:var(--red);font-size:15px;font-weight:700;margin-bottom:10px">❌ FRAUD DETECTED</div>
+        <div class="result-row"><span class="rk">Status</span><span style="color:var(--red)">No matching record found on blockchain</span></div>
+        <div class="result-row"><span class="rk">Hash Match</span><span style="color:var(--red)">FAILED — Hash mismatch</span></div>
+        <div class="result-row"><span class="rk">Smart Contract Event</span><span class="mono">FRAUD_DETECTED emitted</span></div>
+        <div class="result-row"><span class="rk">Audit Log</span><span style="color:var(--yellow)">Unauthorized attempt recorded</span></div>`;
+    } else if (mode === 'revoked') {
+      el.className = 'result-card show warn';
+      el.innerHTML = `<div style="color:var(--yellow);font-size:15px;font-weight:700;margin-bottom:10px">⚠️ DEGREE REVOKED</div>
+        <div class="result-row"><span class="rk">Degree ID</span><span class="mono">${deg.id}</span></div>
+        <div class="result-row"><span class="rk">Student</span><span>${getStudentName(deg.studentId)}</span></div>
+        <div class="result-row"><span class="rk">Program</span><span>${deg.program}</span></div>
+        <div class="result-row"><span class="rk">University</span><span>${getUniName(deg.uniId)}</span></div>
+        <div class="result-row"><span class="rk">Status</span><span style="color:var(--red)">REVOKED — Do NOT accept this credential</span></div>`;
+    } else {
+      el.className = 'result-card show ok';
+      el.innerHTML = `<div style="color:var(--green);font-size:15px;font-weight:700;margin-bottom:10px">✅ DEGREE VERIFIED</div>
+        <div class="result-row"><span class="rk">Degree ID</span><span class="mono">${deg.id}</span></div>
+        <div class="result-row"><span class="rk">Student</span><span>${getStudentName(deg.studentId)}</span></div>
+        <div class="result-row"><span class="rk">Program</span><span>${deg.program}</span></div>
+        <div class="result-row"><span class="rk">University</span><span>${getUniName(deg.uniId)}</span></div>
+        <div class="result-row"><span class="rk">Year</span><span>${deg.year}</span></div>
+        <div class="result-row"><span class="rk">CGPA</span><span>${deg.cgpa}</span></div>
+        <div class="result-row"><span class="rk">Hash</span><span class="mono" style="color:var(--green)">${deg.hash}</span></div>
+        <div class="result-row"><span class="rk">Tx Hash</span><span class="mono">${deg.txHash}</span></div>`;
+    }
+  }
+
+  function quickVerify() {
+    const val = document.getElementById('quick-input').value.trim();
+    const el = document.getElementById('quick-result');
+    if (!val) return;
+    const deg = BLOCKCHAIN_DATA.degrees.find(d => d.id === val || d.hash.includes(val));
+    if (!deg) buildResultCard(el, null, 'fail');
+    else if (deg.status === 'revoked') buildResultCard(el, deg, 'revoked');
+    else buildResultCard(el, deg, 'ok');
+  }
+
+  function runVerification() {
+    const val = document.getElementById('verify-input').value.trim();
+    const el = document.getElementById('full-result');
+    if (!val) return;
+    const deg = BLOCKCHAIN_DATA.degrees.find(d => d.id === val || d.hash.includes(val));
+    if (!deg) buildResultCard(el, null, 'fail');
+    else if (deg.status === 'revoked') buildResultCard(el, deg, 'revoked');
+    else buildResultCard(el, deg, 'ok');
+  }
+
+  function runBatch() {
+    const lines = document.getElementById('batch-input').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    const el = document.getElementById('batch-results');
+    if (!lines.length) return;
+    el.innerHTML = lines.map((val, i) => {
+      const deg = BLOCKCHAIN_DATA.degrees.find(d => d.id === val || d.hash.includes(val));
+      let badge, info;
+      if (!deg) { badge = 'badge-red'; info = 'FRAUD DETECTED — Not found on blockchain'; }
+      else if (deg.status === 'revoked') { badge = 'badge-yellow'; info = `REVOKED — ${deg.program} · ${getUniName(deg.uniId)} · ${getStudentName(deg.studentId)}`; }
+      else { badge = 'badge-green'; info = `VERIFIED — ${deg.program} · ${getUniName(deg.uniId)} · ${getStudentName(deg.studentId)} · CGPA: ${deg.cgpa}`; }
+      return `<div class="case-card"><span class="case-num">${i+1}</span><strong class="mono">${val}</strong>&nbsp;&nbsp;<span class="badge ${badge}">${badge.includes('green')?'VERIFIED':badge.includes('yellow')?'REVOKED':'FRAUD'}</span><div style="font-size:12px;color:var(--muted);margin-top:6px">${info}</div></div>`;
+    }).join('');
+  }
+
+  function renderVerifSummary() {
+    const el = document.getElementById('emp-verif-summary');
+    if (!el) return;
+    el.innerHTML = BLOCKCHAIN_DATA.verifications.map(v => `
+      <div class="case-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span class="mono">${v.degreeId}</span>
+          <span class="badge ${v.result==='verified'?'badge-green':v.result==='fraud'?'badge-red':'badge-yellow'}">${v.result.toUpperCase()}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">${getEmpName(v.empId)} · ${v.timestamp} · ${v.responseTime||'—'}</div>
+      </div>`).join('');
+  }
+
+  function renderFullVerifTable() {
+    const tbody = document.getElementById('full-verif-table');
+    if (!tbody) return;
+    tbody.innerHTML = BLOCKCHAIN_DATA.verifications.map(v => {
+      const deg = BLOCKCHAIN_DATA.degrees.find(d => d.id === v.degreeId);
+      return `<tr>
+        <td class="mono">${v.id}</td>
+        <td class="mono">${v.degreeId}</td>
+        <td>${deg ? getStudentName(deg.studentId) : '—'}</td>
+        <td>${deg ? deg.program : '—'}</td>
+        <td>${deg ? getUniName(deg.uniId) : '—'}</td>
+        <td><span class="badge ${v.result==='verified'?'badge-green':v.result==='fraud'?'badge-red':'badge-yellow'}">${v.result.toUpperCase()}</span></td>
+        <td class="mono">${v.responseTime||'—'}</td>
+        <td class="mono">${v.timestamp}</td>
+        <td class="mono">${v.txHash}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderSimulationCases() {
+    const el = document.getElementById('simulation-cases');
+    if (!el) return;
+    el.innerHTML = BLOCKCHAIN_DATA.verifications.map((v, i) => {
+      const deg = BLOCKCHAIN_DATA.degrees.find(d => d.id === v.degreeId);
+      const badge = v.result==='verified'?'badge-green':v.result==='fraud'?'badge-red':'badge-yellow';
+      const icon = v.result==='verified'?'✅':v.result==='fraud'?'❌':'⚠️';
+      return `<div class="case-card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:14px;font-weight:600"><span class="case-num">${i+1}</span>Case ${i+1}: ${icon} ${v.result.toUpperCase()}</span>
+          <span class="badge ${badge}">${v.result.toUpperCase()}</span>
+        </div>
+        <div class="result-row"><span class="rk">Degree ID</span><span class="mono">${v.degreeId}</span></div>
+        <div class="result-row"><span class="rk">Employer</span><span>${getEmpName(v.empId)}</span></div>
+        <div class="result-row"><span class="rk">Student</span><span>${deg ? getStudentName(deg.studentId) : '<span style="color:var(--red)">NOT FOUND ON CHAIN</span>'}</span></div>
+        <div class="result-row"><span class="rk">Program</span><span>${deg ? deg.program : '—'}</span></div>
+        ${v.note ? `<div class="result-row"><span class="rk">Note</span><span style="color:var(--red)">${v.note}</span></div>` : ''}
+        <div class="result-row"><span class="rk">Timestamp</span><span class="mono">${v.timestamp}</span></div>
+        <div class="result-row"><span class="rk">Tx Hash</span><span class="mono">${v.txHash}</span></div>
+        <div class="result-row"><span class="rk">Response Time</span><span class="mono">${v.responseTime||'—'}</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  function exportVerifHistory() {
+    const rows = ['ID,Degree ID,Student,Program,University,Result,Response Time,Timestamp,Tx Hash',
+      ...BLOCKCHAIN_DATA.verifications.map(v => {
+        const deg = BLOCKCHAIN_DATA.degrees.find(d=>d.id===v.degreeId);
+        return `${v.id},${v.degreeId},${deg?getStudentName(deg.studentId):'UNKNOWN'},${deg?deg.program:'—'},${deg?getUniName(deg.uniId):'—'},${v.result},${v.responseTime||'—'},${v.timestamp},${v.txHash}`;
+      })].join('\n');
+    const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows); a.download='verification_history.csv'; a.click();
+  }
+
+  // Init
+  renderVerifSummary();
+  renderFullVerifTable();
+  renderSimulationCases();
+</script>
+</body>
+</html>

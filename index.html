@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>BlockDegree — Blockchain Degree Attestation System</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; background: radial-gradient(ellipse at 20% 50%, rgba(0,229,255,.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(124,58,237,.05) 0%, transparent 50%), var(--bg); }
+    .home { text-align:center; max-width:680px; padding:40px 20px; }
+    .logo-wrap { margin-bottom: 28px; }
+    .logo-icon-big {
+      width: 72px; height: 72px; border-radius: 18px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center; font-size: 36px;
+      box-shadow: 0 0 40px rgba(0,229,255,.3), 0 0 80px rgba(0,229,255,.1);
+    }
+    .logo-tag { display: inline-block; background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-family: var(--font-mono); color: var(--accent); letter-spacing: .08em; margin-bottom: 12px; }
+    h1 { font-family: var(--font-mono); font-size: 32px; color: var(--text); margin-bottom: 8px; letter-spacing: -.02em; }
+    h1 span { color: var(--accent); }
+    .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 10px; line-height: 1.6; }
+    .uni-tag { display: inline-block; color: var(--text2); font-size: 12px; margin-bottom: 36px; }
+    .cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    @media(max-width:600px) { .cards { grid-template-columns: 1fr; } }
+    .entry-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px 16px; cursor: pointer; text-decoration: none; color: var(--text);
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      display: block;
+    }
+    .entry-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,229,255,.1); }
+    .entry-card .icon { font-size: 32px; margin-bottom: 10px; }
+    .entry-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .entry-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .entry-card .role-badge { display: inline-block; margin-top: 10px; font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: 10px; }
+    .chain-bar {
+      display: flex; align-items: center; justify-content: center; gap: 20px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 20px; font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    }
+    .chain-stat { text-align: center; }
+    .chain-stat .cv { font-size: 16px; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
+    .chain-divider { width: 1px; height: 30px; background: var(--border); }
+    .iqra-badge { margin-top: 18px; font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="home">
+    <div class="logo-wrap">
+      <div class="logo-icon-big">⛓️</div>
+      <div class="logo-tag">BLOCKCHAIN SECURITY · CCP PROJECT</div>
+      <h1>Block<span>Degree</span></h1>
+      <p class="subtitle">A secure, tamper-proof Degree Attestation System built on a Private Blockchain network.<br>Universities issue digital credentials — Employers verify instantly, without intermediaries.</p>
+      <p class="uni-tag">🏛️ Iqra University · Faculty of Engineering Sciences and Technology · BSCS/CB</p>
+    </div>
+
+    <div class="cards">
+      <a class="entry-card" href="user-dashboard.html">
+        <div class="icon">🎓</div>
+        <h3>Student Portal</h3>
+        <p>View your blockchain degrees, share credentials with employers</p>
+        <div class="role-badge badge badge-blue">Student Role</div>
+      </a>
+      <a class="entry-card" href="employer-dashboard.html">
+        <div class="icon">🏢</div>
+        <h3>Employer Portal</h3>
+        <p>Verify degree authenticity instantly against blockchain records</p>
+        <div class="role-badge badge badge-green">Employer Role</div>
+      </a>
+      <a class="entry-card" href="admin-dashboard.html">
+        <div class="icon">🛡️</div>
+        <h3>Super Admin</h3>
+        <p>Full system control: users, degrees, fraud, reports, settings</p>
+        <div class="role-badge badge badge-red">Admin Role</div>
+      </a>
+    </div>
+
+    <div class="chain-bar">
+      <div class="chain-stat"><div class="cv">● Online</div><div>Network Status</div></div>
+      <div class="chain-divider"></div>
+      <div class="chain-stat"><div class="cv">18,204</div><div>Block Height</div></div>
+      <div class="chain-divider"></div>
+      <div class="chain-stat"><div class="cv">4/4</div><div>Peers Active</div></div>
+      <div class="chain-divider"></div>
+      <div class="chain-stat"><div class="cv">3</div><div>Smart Contracts</div></div>
+      <div class="chain-divider"></div>
+      <div class="chain-stat"><div class="cv">99.9%</div><div>Uptime</div></div>
+    </div>
+    <div class="iqra-badge">Muhammad Hassan Shahzad · STU001 · 68597 · Blockchain Security Project</div>
+  </div>
+</body>
+</html>
