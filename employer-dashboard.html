@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Employer Dashboard — BlockDegree</title>
-  <script>const _t=localStorage.getItem('bd-theme')||'dark';if(_t==='light')document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('light'));</script>
   <link rel="stylesheet" href="styles.css" />
   <style>
     .result-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-top: 14px; display: none; }
@@ -19,6 +18,55 @@
     .case-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:15px; margin-bottom:11px; }
     .case-num { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--accent2); color:#fff; font-size:11px; font-weight:700; margin-right:7px; flex-shrink:0; }
   </style>
+
+  <!-- BlockDegree: Theme + Sidebar (inline — works on any server) -->
+  <script>
+    (function(){
+      try {
+        var t = localStorage.getItem('bd-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch(e) {}
+    })();
+
+    function toggleTheme() {
+      var html = document.documentElement;
+      var next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', next);
+      try { localStorage.setItem('bd-theme', next); } catch(e) {}
+      _updateThemeBtn();
+    }
+    function _updateThemeBtn() {
+      var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      document.querySelectorAll('.theme-toggle').forEach(function(btn) {
+        var icon  = btn.querySelector('.theme-icon');
+        var label = btn.querySelector('.theme-label');
+        if (icon)  icon.textContent  = isLight ? '🌙' : '☀️';
+        if (label) label.textContent = isLight ? 'Dark' : 'Light';
+      });
+    }
+    function openSidebar() {
+      var sb = document.getElementById('sidebar');
+      var ov = document.getElementById('sidebarOverlay');
+      if (sb) sb.classList.add('open');
+      if (ov) ov.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      var sb = document.getElementById('sidebar');
+      var ov = document.getElementById('sidebarOverlay');
+      if (sb) sb.classList.remove('open');
+      if (ov) ov.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      _updateThemeBtn();
+      document.querySelectorAll('.nav-item').forEach(function(el) {
+        el.addEventListener('click', function() {
+          if (window.innerWidth <= 768) closeSidebar();
+        });
+      });
+    });
+  </script>
 </head>
 <body>
 <div class="layout">
@@ -253,7 +301,6 @@
 </div>
 
 <script src="data.js"></script>
-<script src="theme.js"></script>
 <script>
   function showPage(id, el) {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));

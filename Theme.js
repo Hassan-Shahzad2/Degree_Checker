@@ -1,42 +1,13 @@
-// theme.js — BlockDegree shared theme + mobile nav helpers
+// theme.js — BlockDegree · Inline-safe theme + sidebar helpers
+// This file is kept for reference but all logic is also inlined in each HTML.
+// The inline version in each HTML always wins.
+
 (function () {
-  // ── Apply saved theme immediately (no flash) ──
-  const saved = localStorage.getItem('bd-theme') || 'dark';
-  if (saved === 'light') document.body.classList.add('light');
-
-  function updateToggleBtn() {
-    document.querySelectorAll('.theme-toggle').forEach(btn => {
-      const isLight = document.body.classList.contains('light');
-      btn.querySelector('.theme-icon').textContent = isLight ? '🌙' : '☀️';
-      btn.querySelector('.theme-label').textContent = isLight ? 'Dark' : 'Light';
-    });
-  }
-
-  window.toggleTheme = function () {
-    document.body.classList.toggle('light');
-    localStorage.setItem('bd-theme', document.body.classList.contains('light') ? 'light' : 'dark');
-    updateToggleBtn();
-  };
-
-  // ── Sidebar toggle ──
-  window.openSidebar = function () {
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('sidebarOverlay').classList.add('show');
-    document.body.style.overflow = 'hidden';
-  };
-  window.closeSidebar = function () {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebarOverlay').classList.remove('show');
-    document.body.style.overflow = '';
-  };
-
-  document.addEventListener('DOMContentLoaded', function () {
-    updateToggleBtn();
-    // Close sidebar when nav-item clicked on mobile
-    document.querySelectorAll('.nav-item').forEach(function (el) {
-      el.addEventListener('click', function () {
-        if (window.innerWidth <= 768) closeSidebar();
-      });
-    });
-  });
+  // Apply saved theme to <html> element immediately (works before <body> exists)
+  try {
+    var saved = localStorage.getItem('bd-theme') || 'dark';
+    if (saved === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  } catch(e) {}
 })();

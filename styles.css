@@ -37,7 +37,7 @@
 }
 
 /* ── Light Mode ── */
-body.light {
+[data-theme="light"] {
   --bg:        #f0f4f8;
   --surface:   #ffffff;
   --surface2:  #f8fafc;
@@ -313,7 +313,7 @@ tr:hover td { background: var(--surface2); }
 .badge-orange { background: rgba(249,115,22,.1);  color: var(--orange); border: 1px solid rgba(249,115,22,.3); }
 
 /* light mode badge adjustments */
-body.light .badge-blue { background: rgba(2,132,199,.08); color: var(--accent); }
+[data-theme="light"] .badge-blue { background: rgba(2,132,199,.08); color: var(--accent); }
 
 /* ══════════════════════════════════════
    BUTTONS
@@ -496,6 +496,15 @@ body.light .badge-blue { background: rgba(2,132,199,.08); color: var(--accent); 
 .step-num.done    { background: var(--green); color: #fff; }
 .step-num.pending { background: var(--border2); color: var(--muted); }
 
+/* ── Login gate shake animation ── */
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(5px)}
+}
+
 /* ══════════════════════════════════════
    BOTTOM NAV (mobile only)
 ══════════════════════════════════════ */
@@ -608,25 +617,25 @@ body.light .badge-blue { background: rgba(2,132,199,.08); color: var(--accent); 
 /* ══════════════════════════════════════
    LIGHT MODE OVERRIDES
 ══════════════════════════════════════ */
-body.light .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,.08); }
-body.light .topbar  { box-shadow: 0 1px 8px rgba(0,0,0,.06); }
-body.light .stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-body.light .degree-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-body.light .terminal { color: #166534; }
-body.light .hash { color: var(--accent); }
-body.light .chain-status { color: var(--green); }
-body.light .dot { background: var(--green); }
-body.light .log-dot.success { box-shadow: 0 0 4px var(--green); }
-body.light .log-dot.warning { box-shadow: 0 0 4px var(--yellow); }
-body.light .log-dot.danger  { box-shadow: 0 0 4px var(--red); }
-body.light .nav-item.active { background: rgba(2,132,199,.06); color: var(--accent); }
-body.light .sidebar-logo .logo-icon { box-shadow: 0 0 14px rgba(2,132,199,.2); }
-body.light .btn-primary { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; }
-body.light .btn-primary:hover { box-shadow: 0 0 14px rgba(2,132,199,.25); }
-body.light .verify-result.ok   { background: rgba(5,150,105,.06); }
-body.light .verify-result.fail { background: rgba(220,38,38,.05); }
-body.light .fraud-card { background: rgba(220,38,38,.04); }
-body.light .bottom-nav { box-shadow: 0 -2px 12px rgba(0,0,0,.08); }
+[data-theme="light"] .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,.08); }
+[data-theme="light"] .topbar  { box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+[data-theme="light"] .stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+[data-theme="light"] .degree-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+[data-theme="light"] .terminal { color: #166534; }
+[data-theme="light"] .hash { color: var(--accent); }
+[data-theme="light"] .chain-status { color: var(--green); }
+[data-theme="light"] .dot { background: var(--green); }
+[data-theme="light"] .log-dot.success { box-shadow: 0 0 4px var(--green); }
+[data-theme="light"] .log-dot.warning { box-shadow: 0 0 4px var(--yellow); }
+[data-theme="light"] .log-dot.danger  { box-shadow: 0 0 4px var(--red); }
+[data-theme="light"] .nav-item.active { background: rgba(2,132,199,.06); color: var(--accent); }
+[data-theme="light"] .sidebar-logo .logo-icon { box-shadow: 0 0 14px rgba(2,132,199,.2); }
+[data-theme="light"] .btn-primary { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; }
+[data-theme="light"] .btn-primary:hover { box-shadow: 0 0 14px rgba(2,132,199,.25); }
+[data-theme="light"] .verify-result.ok   { background: rgba(5,150,105,.06); }
+[data-theme="light"] .verify-result.fail { background: rgba(220,38,38,.05); }
+[data-theme="light"] .fraud-card { background: rgba(220,38,38,.04); }
+[data-theme="light"] .bottom-nav { box-shadow: 0 -2px 12px rgba(0,0,0,.08); }
 
 /* ── Smooth transitions on theme change ── */
 .sidebar, .main, .topbar, .section, .stat-card, .modal,

@@ -4,11 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Super Admin — BlockDegree</title>
-  <script>const _t=localStorage.getItem('bd-theme')||'dark';if(_t==='light')document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('light'));</script>
   <link rel="stylesheet" href="styles.css" />
   <style>
     .sc-log { font-family:var(--font-mono); font-size:11.5px; background:var(--bg); padding:14px; border-radius:8px; border:1px solid var(--border); color:var(--green); line-height:1.9; overflow-x:auto; }
-    body.light .sc-log { color:#166534; }
+    [data-theme="light"] .sc-log { color:#166534; }
     .report-box { font-family:var(--font-mono); font-size:11.5px; color:var(--text2); line-height:1.9; overflow-x:auto; }
     .abi-box { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; font-family:var(--font-mono); font-size:11px; color:var(--accent3); line-height:1.8; display:none; margin-top:10px; overflow-x:auto; }
     .abi-box.show { display:block; }
@@ -16,9 +15,177 @@
     .result-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; gap:8px; flex-wrap:wrap; }
     .result-row:last-child { border-bottom:none; }
     .result-row .rk { color:var(--muted); font-size:12px; flex-shrink:0; }
+
+    /* ── Login Gate ── */
+    #login-gate {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      transition: background .25s;
+    }
+    #login-gate.hidden { display: none; }
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 100%; max-width: 400px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+      animation: modalIn .3s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:translateY(16px)scale(.97)} to{opacity:1;transform:translateY(0)scale(1)} }
+    .login-logo {
+      width: 60px; height: 60px; border-radius: 14px; margin: 0 auto 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 0 28px rgba(0,229,255,.25);
+    }
+    .login-box h2 { font-family: var(--font-mono); font-size: 18px; color: var(--accent); margin-bottom: 4px; }
+    .login-box p  { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+    .login-field {
+      position: relative; margin-bottom: 14px; text-align: left;
+    }
+    .login-field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; letter-spacing: .04em; text-transform: uppercase; }
+    .login-field input {
+      width: 100%; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 11px 42px 11px 14px; color: var(--text);
+      font-family: var(--font-body); font-size: 14px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .login-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,.1); }
+    .pw-toggle {
+      position: absolute; right: 12px; bottom: 11px;
+      background: none; border: none; cursor: pointer;
+      font-size: 16px; color: var(--muted); padding: 0;
+      transition: color .15s;
+    }
+    .pw-toggle:hover { color: var(--text); }
+    .login-btn {
+      width: 100%; padding: 12px; border-radius: 8px; border: none;
+      background: linear-gradient(135deg, var(--accent3), var(--accent));
+      color: #000; font-family: var(--font-body); font-size: 14px;
+      font-weight: 700; cursor: pointer; margin-top: 6px;
+      transition: opacity .15s, box-shadow .15s;
+      letter-spacing: .02em;
+    }
+    .login-btn:hover { opacity: .88; box-shadow: 0 0 20px rgba(0,229,255,.3); }
+    .login-btn:active { opacity: .75; }
+    .login-error {
+      background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3);
+      color: var(--red); border-radius: 8px; padding: 10px 14px;
+      font-size: 13px; margin-top: 12px; display: none;
+      animation: shake .3s ease;
+    }
+    .login-error.show { display: block; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    .login-attempts { font-size: 11px; color: var(--muted); margin-top: 10px; font-family: var(--font-mono); }
+    .login-footer { margin-top: 22px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 16px; }
+    .login-footer a { color: var(--accent); text-decoration: none; }
+    .login-footer a:hover { text-decoration: underline; }
+    /* Locked state */
+    .login-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .locked-msg { font-size: 12px; color: var(--red); font-family: var(--font-mono); margin-top: 8px; }
   </style>
+
+  <!-- BlockDegree: Theme + Sidebar (inline — works on any server) -->
+  <script>
+    (function(){
+      try {
+        var t = localStorage.getItem('bd-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch(e) {}
+    })();
+
+    function toggleTheme() {
+      var html = document.documentElement;
+      var next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', next);
+      try { localStorage.setItem('bd-theme', next); } catch(e) {}
+      _updateThemeBtn();
+    }
+    function _updateThemeBtn() {
+      var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      document.querySelectorAll('.theme-toggle').forEach(function(btn) {
+        var icon  = btn.querySelector('.theme-icon');
+        var label = btn.querySelector('.theme-label');
+        if (icon)  icon.textContent  = isLight ? '🌙' : '☀️';
+        if (label) label.textContent = isLight ? 'Dark' : 'Light';
+      });
+    }
+    function openSidebar() {
+      var sb = document.getElementById('sidebar');
+      var ov = document.getElementById('sidebarOverlay');
+      if (sb) sb.classList.add('open');
+      if (ov) ov.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      var sb = document.getElementById('sidebar');
+      var ov = document.getElementById('sidebarOverlay');
+      if (sb) sb.classList.remove('open');
+      if (ov) ov.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      _updateThemeBtn();
+      document.querySelectorAll('.nav-item').forEach(function(el) {
+        el.addEventListener('click', function() {
+          if (window.innerWidth <= 768) closeSidebar();
+        });
+      });
+    });
+  </script>
 </head>
 <body>
+<!-- ══ ADMIN LOGIN GATE ══ -->
+<div id="login-gate">
+  <div class="login-box">
+    <div class="login-logo">🛡️</div>
+    <h2>Super Admin</h2>
+    <p>BlockDegree · Restricted Access<br>Enter your admin password to continue</p>
+
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="login-user" value="admin" readonly
+             style="color:var(--accent);font-family:var(--font-mono);cursor:default"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-pw" placeholder="Enter password"
+             onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="pw-toggle" type="button" onclick="togglePw()" title="Show/hide password">👁️</button>
+    </div>
+
+    <button class="login-btn" id="login-btn" type="button" onclick="doLogin()">
+      🔐 Login to Admin Panel
+    </button>
+
+    <div class="login-error" id="login-error">
+      ❌ Incorrect password. Please try again.
+    </div>
+    <div class="login-attempts" id="login-attempts"></div>
+    <div class="locked-msg" id="locked-msg"></div>
+
+    <div class="login-footer">
+      <a href="index.html">← Back to Home</a>
+      &nbsp;·&nbsp;
+      <a href="user-dashboard.html">Student Portal</a>
+      &nbsp;·&nbsp;
+      <a href="employer-dashboard.html">Employer Portal</a>
+    </div>
+  </div>
+</div>
+
 <div class="layout">
 
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -530,7 +697,6 @@ contract VerifyContract {<br>
 </div>
 
 <script src="data.js"></script>
-<script src="theme.js"></script>
 <script>
   let allDegrees = [...BLOCKCHAIN_DATA.degrees];
 
@@ -713,6 +879,131 @@ SMART CONTRACT SUMMARY
   }
 
   renderDashboard();
+</script>
+
+<!-- ══ LOGIN GATE SCRIPT ══ -->
+<script>
+  (function () {
+    var CORRECT_PW   = 'hassan123';
+    var MAX_ATTEMPTS = 5;
+    var LOCK_SECONDS = 30;
+    var SESSION_KEY  = 'bd-admin-auth';
+    var ATTEMPTS_KEY = 'bd-admin-attempts';
+    var LOCK_KEY     = 'bd-admin-lock';
+
+    var gate     = document.getElementById('login-gate');
+    var pwInput  = document.getElementById('login-pw');
+    var errBox   = document.getElementById('login-error');
+    var attBox   = document.getElementById('login-attempts');
+    var lockMsg  = document.getElementById('locked-msg');
+    var loginBtn = document.getElementById('login-btn');
+
+    // Check if already authenticated this session
+    function isAuthed() {
+      try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch(e) { return false; }
+    }
+    function getAttempts() {
+      try { return parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0'); } catch(e) { return 0; }
+    }
+    function getLockUntil() {
+      try { return parseInt(localStorage.getItem(LOCK_KEY) || '0'); } catch(e) { return 0; }
+    }
+    function isLocked() {
+      return getLockUntil() > Date.now();
+    }
+    function lockRemaining() {
+      return Math.ceil((getLockUntil() - Date.now()) / 1000);
+    }
+
+    // Show gate or let through
+    if (isAuthed()) {
+      gate.classList.add('hidden');
+    } else {
+      // Block layout from being interactable while gate is up
+      document.querySelector('.layout').style.display = 'none';
+      checkLockState();
+      pwInput.focus();
+    }
+
+    function checkLockState() {
+      if (isLocked()) {
+        loginBtn.disabled = true;
+        pwInput.disabled  = true;
+        var rem = lockRemaining();
+        lockMsg.textContent = '🔒 Too many attempts. Locked for ' + rem + 's';
+        attBox.textContent  = '';
+        var t = setInterval(function () {
+          if (!isLocked()) {
+            clearInterval(t);
+            loginBtn.disabled = false;
+            pwInput.disabled  = false;
+            lockMsg.textContent = '';
+            attBox.textContent  = '';
+            pwInput.focus();
+            try { localStorage.setItem(ATTEMPTS_KEY, '0'); } catch(e){}
+          } else {
+            lockMsg.textContent = '🔒 Too many attempts. Locked for ' + lockRemaining() + 's';
+          }
+        }, 1000);
+      } else {
+        var a = getAttempts();
+        if (a > 0) {
+          attBox.textContent = (MAX_ATTEMPTS - a) + ' attempt(s) remaining';
+        }
+      }
+    }
+
+    window.doLogin = function () {
+      if (isLocked()) return;
+      var entered = pwInput.value;
+
+      if (entered === CORRECT_PW) {
+        // Success
+        try {
+          sessionStorage.setItem(SESSION_KEY, '1');
+          localStorage.setItem(ATTEMPTS_KEY, '0');
+          localStorage.removeItem(LOCK_KEY);
+        } catch(e) {}
+
+        // Animate out
+        gate.style.transition = 'opacity .4s ease, transform .4s ease';
+        gate.style.opacity    = '0';
+        gate.style.transform  = 'scale(1.03)';
+        setTimeout(function () {
+          gate.classList.add('hidden');
+          document.querySelector('.layout').style.display = '';
+        }, 380);
+
+      } else {
+        // Wrong password
+        var attempts = getAttempts() + 1;
+        try { localStorage.setItem(ATTEMPTS_KEY, String(attempts)); } catch(e){}
+
+        if (attempts >= MAX_ATTEMPTS) {
+          try { localStorage.setItem(LOCK_KEY, String(Date.now() + LOCK_SECONDS * 1000)); } catch(e){}
+          checkLockState();
+        } else {
+          attBox.textContent = (MAX_ATTEMPTS - attempts) + ' attempt(s) remaining';
+        }
+
+        errBox.classList.remove('show');
+        void errBox.offsetWidth; // force reflow to restart animation
+        errBox.classList.add('show');
+        pwInput.value = '';
+        pwInput.focus();
+
+        // Shake the box
+        var box = document.querySelector('.login-box');
+        box.style.animation = 'none';
+        void box.offsetWidth;
+        box.style.animation = 'shake .35s ease';
+      }
+    };
+
+    window.togglePw = function () {
+      pwInput.type = pwInput.type === 'password' ? 'text' : 'password';
+    };
+  })();
 </script>
 </body>
 </html>

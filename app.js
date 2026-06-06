@@ -7,4 +7,4 @@
 
 console.log("BlockDegree System Initialized.");
 console.log("Student: Muhammad Hassan Shahzad | ID: 68597");
-console.log("Blockchain Security | Iqra University");
+console.log("Blockchain Security CCP | Iqra University");
