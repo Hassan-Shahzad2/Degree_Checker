@@ -4,19 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Dashboard — BlockDegree</title>
+  <script>const _t=localStorage.getItem('bd-theme')||'dark';if(_t==='light')document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('light'));</script>
   <link rel="stylesheet" href="styles.css" />
   <style>
     .cert-box {
       background: linear-gradient(135deg, rgba(0,229,255,.04), rgba(124,58,237,.06));
-      border: 1px solid var(--border2); border-radius: 12px; padding: 28px;
+      border: 1px solid var(--border2); border-radius: 12px; padding: 24px;
       text-align: center; position: relative; overflow: hidden;
     }
-    .cert-box::before { content:''; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; background:radial-gradient(rgba(0,229,255,.1),transparent); }
-    .qr-placeholder { width: 80px; height: 80px; margin: 12px auto; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size:28px; }
-    .share-bar { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; justify-content:center; }
-    .timeline-item { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
-    .timeline-item:last-child { border-bottom:none; }
-    .tl-dot { width:10px; height:10px; border-radius:50%; margin-top:4px; flex-shrink:0; }
+    body.light .cert-box { background: linear-gradient(135deg, rgba(2,132,199,.04), rgba(124,58,237,.04)); }
+    .qr-placeholder { width: 72px; height: 72px; margin: 10px auto; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size:26px; }
     .skill-bar { margin-bottom:10px; }
     .skill-bar .skill-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; color:var(--muted); }
     .skill-track { height:8px; background:var(--bg); border-radius:4px; overflow:hidden; border:1px solid var(--border); }
@@ -24,13 +21,19 @@
     .notif-item { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border); }
     .notif-item:last-child { border-bottom:none; }
     .notif-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
-    .ni-green { background:rgba(16,185,129,.12); }
-    .ni-blue  { background:rgba(0,229,255,.08); }
-    .ni-yellow{ background:rgba(245,158,11,.1); }
+    .ni-green  { background:rgba(16,185,129,.12); }
+    .ni-blue   { background:rgba(0,229,255,.08); }
+    .ni-yellow { background:rgba(245,158,11,.1); }
+    .timeline-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+    .timeline-item:last-child { border-bottom:none; }
+    .tl-dot { width:10px; height:10px; border-radius:50%; margin-top:4px; flex-shrink:0; }
   </style>
 </head>
 <body>
 <div class="layout">
+
+  <!-- Sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
@@ -50,57 +53,48 @@
       <a class="nav-item" onclick="showPage('profile',this)"><span class="icon">👤</span> Profile & Identity</a>
       <a class="nav-item" onclick="showPage('notifications',this)"><span class="icon">🔔</span> Notifications</a>
       <a class="nav-item" onclick="showPage('settings',this)"><span class="icon">⚙️</span> Settings</a>
-      <div class="nav-section-label">Navigation</div>
+      <div class="nav-section-label">Navigate</div>
       <a class="nav-item" href="employer-dashboard.html"><span class="icon">🏢</span> Employer Portal</a>
       <a class="nav-item" href="admin-dashboard.html"><span class="icon">🛡️</span> Admin Panel</a>
       <a class="nav-item" href="index.html"><span class="icon">↩️</span> Home</a>
     </nav>
     <div class="sidebar-footer">
       <div class="avatar">MH</div>
-      <div>
+      <div style="min-width:0">
         <div class="footer-name">M. Hassan Shahzad</div>
         <div class="footer-role">● Student · 68597</div>
       </div>
     </div>
   </aside>
 
+  <!-- MAIN -->
   <div class="main">
+    <!-- TOPBAR -->
     <div class="topbar">
-      <div style="display:flex;align-items:center;gap:12px">
-        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;color:var(--text);font-size:18px;cursor:pointer" id="menuBtn">☰</button>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <button class="menu-toggle" onclick="openSidebar()">☰</button>
         <h1 id="page-title">Dashboard</h1>
       </div>
       <div class="topbar-right">
-        <div class="chain-status"><div class="dot"></div> Chain Online</div>
-        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">Block #18,204</span>
-        <button class="btn btn-primary btn-sm" onclick="showModal('requestModal')">+ Request Degree</button>
+        <div class="chain-status"><div class="dot"></div><span class="chain-text">Chain Online</span></div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <span class="theme-icon">☀️</span><span class="theme-label">Light</span>
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="showModal('requestModal')">+ Request</button>
       </div>
     </div>
 
+    <!-- CONTENT -->
     <div class="content">
 
-      <!-- ══ OVERVIEW ══ -->
+      <!-- OVERVIEW -->
       <div class="page active" id="page-overview">
         <div class="stats-grid">
-          <div class="stat-card blue">
-            <div class="label">My Degrees</div><div class="value">2</div>
-            <div class="sub">Issued on blockchain</div><div class="icon-bg">🎓</div>
-          </div>
-          <div class="stat-card green">
-            <div class="label">Verified by Employers</div><div class="value">1</div>
-            <div class="sub">Successful verifications</div><div class="icon-bg">✅</div>
-          </div>
-          <div class="stat-card yellow">
-            <div class="label">Pending Requests</div><div class="value">0</div>
-            <div class="sub">Awaiting issuance</div><div class="icon-bg">⏳</div>
-          </div>
-          <div class="stat-card purple">
-            <div class="label">Student ID</div>
-            <div class="value" style="font-size:18px;color:#a78bfa">68597</div>
-            <div class="sub">Muhammad Hassan Shahzad</div><div class="icon-bg">🪪</div>
-          </div>
+          <div class="stat-card blue"><div class="label">My Degrees</div><div class="value">2</div><div class="sub">Issued on-chain</div><div class="icon-bg">🎓</div></div>
+          <div class="stat-card green"><div class="label">Verified</div><div class="value">1</div><div class="sub">By employers</div><div class="icon-bg">✅</div></div>
+          <div class="stat-card yellow"><div class="label">Pending</div><div class="value">0</div><div class="sub">Awaiting issuance</div><div class="icon-bg">⏳</div></div>
+          <div class="stat-card purple"><div class="label">Student ID</div><div class="value" style="font-size:18px;color:#a78bfa">68597</div><div class="sub">M. Hassan Shahzad</div><div class="icon-bg">🪪</div></div>
         </div>
-
         <div class="two-col">
           <div class="section">
             <div class="section-header"><h3>🎓 My Blockchain Degrees</h3><button class="btn btn-outline btn-sm" onclick="showPage('my-degrees',null)">View All →</button></div>
@@ -109,102 +103,82 @@
           <div class="section">
             <div class="section-header"><h3>📡 How It Works</h3></div>
             <div class="section-body">
-              <div class="progress-step">
-                <div class="step-num done">1</div>
-                <div><strong>University Issues Degree</strong><br><span style="color:var(--muted);font-size:12px">Smart contract mints your credential as an immutable on-chain asset with SHA-256 hash.</span></div>
-              </div>
-              <div class="progress-step">
-                <div class="step-num done">2</div>
-                <div><strong>Degree Stored Immutably</strong><br><span style="color:var(--muted);font-size:12px">Metadata (name, ID, program, date, CGPA) is hashed and recorded — tamper-proof forever.</span></div>
-              </div>
-              <div class="progress-step">
-                <div class="step-num">3</div>
-                <div><strong>Share Hash with Employer</strong><br><span style="color:var(--muted);font-size:12px">Provide your degree hash or ID — no physical document needed.</span></div>
-              </div>
-              <div class="progress-step">
-                <div class="step-num pending">4</div>
-                <div><strong>Employer Verifies Instantly</strong><br><span style="color:var(--muted);font-size:12px">Hash comparison against blockchain records — tamper-proof result in &lt;2 seconds.</span></div>
-              </div>
+              <div class="progress-step"><div class="step-num done">1</div><div><strong>University Issues Degree</strong><br><span style="color:var(--muted);font-size:12px">Smart contract mints your credential on-chain with a SHA-256 hash.</span></div></div>
+              <div class="progress-step"><div class="step-num done">2</div><div><strong>Degree Stored Immutably</strong><br><span style="color:var(--muted);font-size:12px">Name, ID, program, CGPA hashed and recorded — tamper-proof forever.</span></div></div>
+              <div class="progress-step"><div class="step-num">3</div><div><strong>Share Hash with Employer</strong><br><span style="color:var(--muted);font-size:12px">Provide your degree hash or ID — no physical document needed.</span></div></div>
+              <div class="progress-step"><div class="step-num pending">4</div><div><strong>Employer Verifies Instantly</strong><br><span style="color:var(--muted);font-size:12px">Hash compared to blockchain records — result in &lt;2 seconds.</span></div></div>
             </div>
           </div>
         </div>
-
         <div class="section">
           <div class="section-header"><h3>🔔 Recent Activity</h3></div>
           <div class="section-body" id="activity-feed"></div>
         </div>
       </div>
 
-      <!-- ══ MY DEGREES ══ -->
+      <!-- MY DEGREES -->
       <div class="page" id="page-my-degrees">
-        <div class="alert alert-info">🔗 All degrees are cryptographically hashed and stored on the private blockchain. They are tamper-proof and permanently verifiable.</div>
+        <div class="alert alert-info">🔗 All degrees are cryptographically hashed and stored on the private blockchain — tamper-proof and permanently verifiable.</div>
         <div id="all-degrees-list"></div>
       </div>
 
-      <!-- ══ SHARE CREDENTIALS ══ -->
+      <!-- SHARE CREDENTIALS -->
       <div class="page" id="page-share">
         <div class="two-col">
           <div class="section">
             <div class="section-header"><h3>🔗 Share a Degree</h3></div>
             <div class="section-body">
-              <div class="form-group">
-                <label>Select Degree</label>
+              <div class="form-group"><label>Select Degree</label>
                 <select id="share-degree-select" onchange="updateShareInfo()">
                   <option value="DEG001">DEG001 — BSCS · Iqra University · 2024</option>
                   <option value="DEG004">DEG004 — MSCS · Iqra University · 2024</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label>Share With (Employer Email)</label>
-                <input type="email" placeholder="hr@company.com" id="share-email"/>
-              </div>
-              <div class="form-group">
-                <label>Message (Optional)</label>
-                <textarea rows="3" placeholder="Please verify my degree for job application..."></textarea>
-              </div>
-              <div class="share-bar">
-                <button class="btn btn-primary" onclick="shareCredential()">📤 Send Verification Link</button>
+              <div class="form-group"><label>Share With (Employer Email)</label><input type="email" placeholder="hr@company.com" id="share-email"/></div>
+              <div class="form-group"><label>Message (Optional)</label><textarea rows="3" placeholder="Please verify my degree for job application..."></textarea></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="shareCredential()">📤 Send Link</button>
                 <button class="btn btn-outline" onclick="copyHash()">📋 Copy Hash</button>
               </div>
-              <div id="share-feedback" class="verify-result" style="margin-top:12px"></div>
+              <div id="share-feedback" class="verify-result"></div>
             </div>
           </div>
           <div class="section">
-            <div class="section-header"><h3>📄 Degree Certificate Preview</h3></div>
+            <div class="section-header"><h3>📄 Certificate Preview</h3></div>
             <div class="section-body">
               <div class="cert-box">
-                <div style="font-size:40px;margin-bottom:6px">🏛️</div>
+                <div style="font-size:36px;margin-bottom:6px">🏛️</div>
                 <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px">BLOCKCHAIN VERIFIED CREDENTIAL</div>
-                <div style="font-size:18px;font-weight:700;margin-bottom:4px">Muhammad Hassan Shahzad</div>
-                <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Student ID: 68597</div>
-                <div style="font-size:13px;color:var(--text2);margin-bottom:4px" id="cert-program">Bachelor of Science in Computer Science (BSCS)</div>
+                <div style="font-size:16px;font-weight:700;margin-bottom:3px">Muhammad Hassan Shahzad</div>
+                <div style="font-size:12px;color:var(--muted);margin-bottom:3px">Student ID: 68597</div>
+                <div style="font-size:13px;color:var(--text2);margin-bottom:3px" id="cert-program">Bachelor of Science — Computer Science (BSCS)</div>
                 <div style="font-size:12px;color:var(--muted)" id="cert-uni">Iqra University · 2024</div>
                 <div class="qr-placeholder">▦</div>
-                <div class="hash" id="cert-hash" style="font-size:10px">0xDEG001HASH_A1B2C3D4E5F6A1B2C3D4E5F6...</div>
-                <div style="font-size:11px;color:var(--green);margin-top:10px">✅ Verified on Private Blockchain · SHA-256 Hash</div>
+                <div class="hash" id="cert-hash" style="font-size:10px">0xDEG001HASH_A1B2C3D4E5F6...</div>
+                <div style="font-size:11px;color:var(--green);margin-top:10px">✅ Verified on Private Blockchain · SHA-256</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ══ VERIFICATION HISTORY ══ -->
+      <!-- VERIFICATION HISTORY -->
       <div class="page" id="page-verif-history">
         <div class="section">
           <div class="section-header"><h3>📋 Employer Verification History</h3></div>
           <div class="section-body table-wrap">
             <table>
-              <thead><tr><th>Verification ID</th><th>Degree</th><th>Employer</th><th>Result</th><th>Response Time</th><th>Timestamp</th><th>Tx Hash</th></tr></thead>
+              <thead><tr><th>ID</th><th>Degree</th><th>Employer</th><th>Result</th><th>Response</th><th>Timestamp</th><th>Tx Hash</th></tr></thead>
               <tbody id="my-verif-table"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ══ TX LOG ══ -->
+      <!-- TX LOG -->
       <div class="page" id="page-tx-log">
         <div class="section">
-          <div class="section-header"><h3>⛓️ My Blockchain Transaction Log</h3></div>
+          <div class="section-header"><h3>⛓️ My Blockchain Transactions</h3></div>
           <div class="section-body" id="my-tx-log"></div>
         </div>
         <div class="section">
@@ -214,13 +188,13 @@
 [2024-06-01 10:00] DegreeContract.issueDegree(STU001, BSCS, UNI001) → DEG001 | Gas: 21,000 | ✅ CONFIRMED<br>
 [2024-07-20 14:00] DegreeContract.issueDegree(STU001, MSCS, UNI001) → DEG004 | Gas: 21,000 | ✅ CONFIRMED<br>
 [2024-09-01 10:00] VerifyContract.verifyDegree(DEG001, EMP001) → VERIFIED | Gas: 8,500 | ✅ CONFIRMED<br>
-[2024-09-07 02:30] AccessContract.checkAccess(DEG002) → <span style="color:var(--red)">UNAUTHORIZED | ACCESS DENIED | LOGGED</span>
+[2024-09-07 02:30] AccessContract.checkAccess(DEG002) → <span style="color:var(--red)">UNAUTHORIZED | DENIED | LOGGED</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ══ PROFILE ══ -->
+      <!-- PROFILE -->
       <div class="page" id="page-profile">
         <div class="two-col">
           <div class="section">
@@ -229,26 +203,26 @@
               <div class="form-group"><label>Full Name</label><input type="text" value="Muhammad Hassan Shahzad"/></div>
               <div class="form-row">
                 <div class="form-group"><label>Student ID</label><input type="text" value="68597"/></div>
-                <div class="form-group"><label>Roll Number</label><input type="text" value="STU001"/></div>
+                <div class="form-group"><label>Roll No.</label><input type="text" value="STU001"/></div>
               </div>
               <div class="form-group"><label>Email</label><input type="text" value="hassan.shahzad@student.iqra.edu.pk"/></div>
               <div class="form-group"><label>University</label><input type="text" value="Iqra University" readonly/></div>
-              <div class="form-group"><label>Enrollment Year</label><input type="text" value="2020"/></div>
-              <div class="form-group"><label>Wallet Address (Blockchain Identity)</label><input type="text" value="0xSTU001MHSF67A2B3C4D5E6F7..." readonly style="color:var(--accent);font-family:var(--font-mono);font-size:12px"/></div>
-              <div style="margin-top:4px;margin-bottom:16px"><span style="font-size:11px;color:var(--green)">✅ Identity verified by Blockchain Certificate Authority</span></div>
+              <div class="form-group"><label>Enrolled</label><input type="text" value="2020"/></div>
+              <div class="form-group"><label>Wallet Address</label><input type="text" value="0xSTU001MHSF67A2B3C4D5E6F7..." readonly style="color:var(--accent);font-family:var(--font-mono);font-size:11px"/></div>
+              <div style="margin-bottom:14px"><span style="font-size:11px;color:var(--green)">✅ Verified by Blockchain CA</span></div>
               <button class="btn btn-primary">Save Changes</button>
             </div>
           </div>
           <div>
-            <div class="section" style="margin-bottom:18px">
-              <div class="section-header"><h3>🪪 Digital Identity Certificate</h3></div>
+            <div class="section" style="margin-bottom:16px">
+              <div class="section-header"><h3>🪪 Identity Certificate</h3></div>
               <div class="section-body">
                 <div class="cert-box" style="text-align:center">
-                  <div style="font-size:36px;margin-bottom:8px">🏛️</div>
-                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:.1em;margin-bottom:8px">IDENTITY CERTIFICATE</div>
-                  <div style="font-size:17px;font-weight:700">Muhammad Hassan Shahzad</div>
+                  <div style="font-size:32px;margin-bottom:7px">🏛️</div>
+                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:.1em;margin-bottom:7px">IDENTITY CERTIFICATE</div>
+                  <div style="font-size:15px;font-weight:700">Muhammad Hassan Shahzad</div>
                   <div style="font-size:12px;color:var(--muted);margin:4px 0">Student · Iqra University · 68597</div>
-                  <div class="hash" style="margin-top:12px;font-size:10px">0xSTU001CERT_MHASHZAD_68597_IQRA...</div>
+                  <div class="hash" style="margin-top:11px;font-size:10px">0xSTU001CERT_MHASHZAD_68597_IQRA...</div>
                   <div style="font-size:11px;color:var(--green);margin-top:8px">✅ Verified by Blockchain CA</div>
                 </div>
               </div>
@@ -265,58 +239,30 @@
         </div>
       </div>
 
-      <!-- ══ NOTIFICATIONS ══ -->
+      <!-- NOTIFICATIONS -->
       <div class="page" id="page-notifications">
         <div class="section">
           <div class="section-header"><h3>🔔 Notifications</h3><span class="badge badge-blue">3 unread</span></div>
           <div class="section-body">
-            <div class="notif-item">
-              <div class="notif-icon ni-green">✅</div>
-              <div>
-                <div style="font-size:13px;font-weight:500">Degree DEG001 Verified by TechCorp Ltd</div>
-                <div style="font-size:12px;color:var(--muted)">TechCorp Ltd successfully verified your BSCS degree on 2024-09-01</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono)">2024-09-01 10:00</div>
-              </div>
-            </div>
-            <div class="notif-item">
-              <div class="notif-icon ni-blue">🎓</div>
-              <div>
-                <div style="font-size:13px;font-weight:500">New Degree Issued: MSCS</div>
-                <div style="font-size:12px;color:var(--muted)">Iqra University has issued your MSCS degree (DEG004) on blockchain</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono)">2024-07-20 14:00</div>
-              </div>
-            </div>
-            <div class="notif-item">
-              <div class="notif-icon ni-yellow">⚠️</div>
-              <div>
-                <div style="font-size:13px;font-weight:500">Unauthorized Access Attempt on DEG002</div>
-                <div style="font-size:12px;color:var(--muted)">An unknown actor attempted to access DEG002 — blocked and logged</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono)">2024-09-07 02:30</div>
-              </div>
-            </div>
-            <div class="notif-item">
-              <div class="notif-icon ni-blue">🎓</div>
-              <div>
-                <div style="font-size:13px;font-weight:500">New Degree Issued: BSCS</div>
-                <div style="font-size:12px;color:var(--muted)">Iqra University has issued your BSCS degree (DEG001) on blockchain</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono)">2024-06-01 10:00</div>
-              </div>
-            </div>
+            <div class="notif-item"><div class="notif-icon ni-green">✅</div><div><div style="font-size:13px;font-weight:500">Degree DEG001 Verified by TechCorp Ltd</div><div style="font-size:12px;color:var(--muted)">TechCorp Ltd verified your BSCS degree on 2024-09-01</div><div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-mono)">2024-09-01 10:00</div></div></div>
+            <div class="notif-item"><div class="notif-icon ni-blue">🎓</div><div><div style="font-size:13px;font-weight:500">New Degree Issued: MSCS</div><div style="font-size:12px;color:var(--muted)">Iqra University issued your MSCS degree (DEG004) on blockchain</div><div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-mono)">2024-07-20 14:00</div></div></div>
+            <div class="notif-item"><div class="notif-icon ni-yellow">⚠️</div><div><div style="font-size:13px;font-weight:500">Unauthorized Access Attempt on DEG002</div><div style="font-size:12px;color:var(--muted)">Unknown actor blocked and logged — 2024-09-07</div><div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-mono)">2024-09-07 02:30</div></div></div>
+            <div class="notif-item"><div class="notif-icon ni-blue">🎓</div><div><div style="font-size:13px;font-weight:500">New Degree Issued: BSCS</div><div style="font-size:12px;color:var(--muted)">Iqra University issued your BSCS degree (DEG001) on blockchain</div><div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-mono)">2024-06-01 10:00</div></div></div>
           </div>
         </div>
       </div>
 
-      <!-- ══ SETTINGS ══ -->
+      <!-- SETTINGS -->
       <div class="page" id="page-settings">
         <div class="two-col">
           <div class="section">
-            <div class="section-header"><h3>🔔 Notification Preferences</h3></div>
+            <div class="section-header"><h3>🔔 Notifications</h3></div>
             <div class="section-body">
               <div class="control-row"><div class="ctrl-info"><strong>Email on Verification</strong><span>Notify when employer verifies your degree</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-              <div class="control-row"><div class="ctrl-info"><strong>Fraud Alert Emails</strong><span>Alert when a fake attempt is detected</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="control-row"><div class="ctrl-info"><strong>Fraud Alert Emails</strong><span>Alert on fake attempts involving you</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
               <div class="control-row"><div class="ctrl-info"><strong>Transaction Confirmations</strong><span>Email for each blockchain transaction</span></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-              <div class="control-row"><div class="ctrl-info"><strong>New Degree Issued</strong><span>Notify when university issues a new degree</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-              <button class="btn btn-primary" style="margin-top:14px">Save Settings</button>
+              <div class="control-row"><div class="ctrl-info"><strong>New Degree Issued</strong><span>Notify when university issues a degree</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <button class="btn btn-primary" style="margin-top:13px">Save Settings</button>
             </div>
           </div>
           <div class="section">
@@ -325,30 +271,41 @@
               <div class="control-row"><div class="ctrl-info"><strong>Public Profile</strong><span>Let employers find you by Student ID</span></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
               <div class="control-row"><div class="ctrl-info"><strong>Require Approval to Share</strong><span>Approve before degree hash is shared</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
               <div class="control-row"><div class="ctrl-info"><strong>Two-Factor Authentication</strong><span>Require 2FA for wallet operations</span></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-              <button class="btn btn-outline" style="margin-top:14px">🔑 Rotate Wallet Key</button>
+              <button class="btn btn-outline" style="margin-top:13px">🔑 Rotate Wallet Key</button>
             </div>
           </div>
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /content -->
 
-<!-- Request Degree Modal -->
+    <!-- BOTTOM NAV (mobile) -->
+    <nav class="bottom-nav">
+      <div class="bottom-nav-items">
+        <a class="bnav-item active" onclick="showPage('overview',null);setActiveBottom(this)"><div class="bni">🏠</div><span>Home</span></a>
+        <a class="bnav-item" onclick="showPage('my-degrees',null);setActiveBottom(this)"><div class="bni">🎓</div><span>Degrees</span></a>
+        <a class="bnav-item" onclick="showPage('share',null);setActiveBottom(this)"><div class="bni">🔗</div><span>Share</span></a>
+        <a class="bnav-item" onclick="showPage('profile',null);setActiveBottom(this)"><div class="bni">👤</div><span>Profile</span></a>
+        <a class="bnav-item" onclick="openSidebar()"><div class="bni">☰</div><span>More</span></a>
+      </div>
+    </nav>
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- Request Modal -->
 <div class="modal-overlay" id="requestModal">
   <div class="modal">
     <h2>📨 Request Degree Issuance</h2>
     <div class="form-group"><label>Student Name</label><input type="text" value="Muhammad Hassan Shahzad"/></div>
     <div class="form-row">
       <div class="form-group"><label>Student ID</label><input type="text" value="68597"/></div>
-      <div class="form-group"><label>Roll Number</label><input type="text" value="STU001"/></div>
+      <div class="form-group"><label>Roll No.</label><input type="text" value="STU001"/></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>Program</label><select><option>BSCS</option><option>BSEE</option><option>MSCS</option><option>MBA</option></select></div>
-      <div class="form-group"><label>Graduation Year</label><input type="text" placeholder="2024"/></div>
+      <div class="form-group"><label>Year</label><input type="text" placeholder="2024"/></div>
     </div>
-    <div class="form-group"><label>Issuing University</label><select><option>Iqra University (UNI001)</option><option>FAST-NUCES (UNI002)</option></select></div>
+    <div class="form-group"><label>University</label><select><option>Iqra University (UNI001)</option><option>FAST-NUCES (UNI002)</option></select></div>
     <div class="form-group"><label>CGPA</label><input type="text" placeholder="3.85"/></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('requestModal')">Cancel</button>
@@ -358,8 +315,8 @@
 </div>
 
 <script src="data.js"></script>
+<script src="theme.js"></script>
 <script>
-  // Navigation
   function showPage(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -367,14 +324,17 @@
     document.getElementById('page-title').textContent = id.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
     if (el) el.classList.add('active');
   }
-  function showModal(id) { document.getElementById(id).classList.add('open'); }
+  function setActiveBottom(el) {
+    document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function showModal(id)  { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
   function submitRequest() {
     closeModal('requestModal');
-    alert('✅ Degree request submitted to blockchain!\nTransaction hash: 0xTXNEW' + Math.random().toString(16).slice(2,10).toUpperCase() + '\nStatus: Pending confirmation...');
+    alert('✅ Degree request submitted!\nTx: 0xTXNEW'+Math.random().toString(16).slice(2,10).toUpperCase()+'\nStatus: Pending...');
   }
 
-  // Render student degrees (STU001 = Muhammad Hassan Shahzad)
   function renderDegrees(containerId, studentId, compact) {
     const degrees = BLOCKCHAIN_DATA.degrees.filter(d => d.studentId === studentId);
     const el = document.getElementById(containerId);
@@ -386,79 +346,64 @@
         </div>
         <h4>🎓 ${d.program} — ${getUniName(d.uniId)}</h4>
         <div class="meta">
-          Student: <strong>Muhammad Hassan Shahzad</strong> · ID: 68597<br>
-          Issued: ${d.timestamp} &nbsp;|&nbsp; Year: ${d.year} &nbsp;|&nbsp; CGPA: ${d.cgpa}<br>
+          <strong>Muhammad Hassan Shahzad</strong> · ID: 68597<br>
+          Issued: ${d.timestamp} · Year: ${d.year} · CGPA: ${d.cgpa}<br>
           Degree ID: <span class="mono">${d.id}</span>
         </div>
         <div class="hash-row"><div class="hash">${d.hash}</div></div>
-        <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <span style="font-size:11px;color:var(--muted)">Tx:</span>
-          <span class="mono">${d.txHash}</span>
-          <span style="font-size:11px;color:var(--muted)">Gas: ${d.gasUsed.toLocaleString()}</span>
-          ${!compact ? `<button class="btn btn-outline btn-sm" onclick="copyToClipboard('${d.hash}')">📋 Copy Hash</button>` : ''}
+        <div style="margin-top:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--muted)">Tx: <span class="mono">${d.txHash}</span></span>
+          ${!compact ? `<button class="btn btn-outline btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText('${d.hash}').then(()=>alert('Hash copied!'))">📋 Copy Hash</button>` : ''}
         </div>
-      </div>
-    `).join('');
-  }
-
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => alert('Hash copied to clipboard!'));
-  }
-
-  // Activity feed
-  function renderActivityFeed() {
-    const el = document.getElementById('activity-feed');
-    if (!el) return;
-    const myLogs = BLOCKCHAIN_DATA.auditLogs.filter(l => l.actor === 'UNI001' || l.target === 'DEG001' || l.target === 'DEG004');
-    el.innerHTML = myLogs.slice(0,6).map(l => `
-      <div class="timeline-item">
-        <div class="tl-dot" style="background:${l.status==='success'?'var(--green)':l.status==='warning'?'var(--yellow)':'var(--red)'}"></div>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:500">${l.action.replace(/_/g,' ')}</div>
-          <div class="mono" style="font-size:11px;color:var(--muted);margin-top:2px">${l.timestamp} · ${l.target} · TX time: ${l.txTime}</div>
-        </div>
-        <span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}">${l.status}</span>
-      </div>
-    `).join('');
-  }
-
-  // Verification history
-  function renderVerifHistory() {
-    const tbody = document.getElementById('my-verif-table');
-    if (!tbody) return;
-    const myDegs = ['DEG001','DEG004'];
-    const verifs = BLOCKCHAIN_DATA.verifications.filter(v => myDegs.includes(v.degreeId));
-    tbody.innerHTML = verifs.map(v => `<tr>
-      <td class="mono">${v.id}</td>
-      <td class="mono">${v.degreeId}</td>
-      <td>${getEmpName(v.empId)}</td>
-      <td><span class="badge ${v.result==='verified'?'badge-green':v.result==='fraud'?'badge-red':'badge-yellow'}">${v.result.toUpperCase()}</span></td>
-      <td class="mono">${v.responseTime || '—'}</td>
-      <td class="mono">${v.timestamp}</td>
-      <td class="mono">${v.txHash}</td>
-    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No verifications yet</td></tr>';
-  }
-
-  // TX log
-  function renderTxLog() {
-    const el = document.getElementById('my-tx-log');
-    if (!el) return;
-    const myLogs = BLOCKCHAIN_DATA.auditLogs.filter(l => ['DEG001','DEG004'].includes(l.target) || l.actor === 'UNI001');
-    el.innerHTML = myLogs.map(l => `
-      <div class="log-item">
-        <div class="log-dot ${l.status}"></div>
-        <div class="log-info" style="flex:1">
-          <div class="action">${l.action} <span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}">${l.status}</span></div>
-          <div class="meta">Actor: ${l.actor} · Target: ${l.target} · ${l.timestamp} · TX Time: ${l.txTime}</div>
-        </div>
-        <span class="mono">${l.id}</span>
       </div>`).join('');
   }
 
-  // Share credential
+  function renderActivityFeed() {
+    const el = document.getElementById('activity-feed');
+    if (!el) return;
+    const myLogs = BLOCKCHAIN_DATA.auditLogs.filter(l => ['DEG001','DEG004'].includes(l.target) || l.actor==='UNI001');
+    el.innerHTML = myLogs.slice(0,5).map(l => `
+      <div class="timeline-item">
+        <div class="tl-dot" style="background:${l.status==='success'?'var(--green)':l.status==='warning'?'var(--yellow)':'var(--red)'}"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500">${l.action.replace(/_/g,' ')}</div>
+          <div class="mono" style="font-size:11px;color:var(--muted);margin-top:2px;word-break:break-all">${l.timestamp} · ${l.target} · ${l.txTime}</div>
+        </div>
+        <span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}" style="flex-shrink:0">${l.status}</span>
+      </div>`).join('');
+  }
+
+  function renderVerifHistory() {
+    const tbody = document.getElementById('my-verif-table');
+    if (!tbody) return;
+    const verifs = BLOCKCHAIN_DATA.verifications.filter(v => ['DEG001','DEG004'].includes(v.degreeId));
+    tbody.innerHTML = verifs.length ? verifs.map(v => `<tr>
+      <td class="mono">${v.id}</td><td class="mono">${v.degreeId}</td>
+      <td>${getEmpName(v.empId)}</td>
+      <td><span class="badge ${v.result==='verified'?'badge-green':'badge-yellow'}">${v.result.toUpperCase()}</span></td>
+      <td class="mono">${v.responseTime||'—'}</td><td class="mono">${v.timestamp}</td>
+      <td class="mono">${v.txHash}</td>
+    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No verifications yet</td></tr>';
+  }
+
+  function renderTxLog() {
+    const el = document.getElementById('my-tx-log');
+    if (!el) return;
+    const logs = BLOCKCHAIN_DATA.auditLogs.filter(l => ['DEG001','DEG004'].includes(l.target) || l.actor==='UNI001');
+    el.innerHTML = logs.map(l => `
+      <div class="log-item">
+        <div class="log-dot ${l.status}"></div>
+        <div class="log-info" style="flex:1;min-width:0">
+          <div class="action">${l.action.replace(/_/g,' ')} <span class="badge ${l.status==='success'?'badge-green':l.status==='warning'?'badge-yellow':'badge-red'}">${l.status}</span></div>
+          <div class="meta" style="word-break:break-all">${l.actor} · ${l.target} · ${l.timestamp} · ${l.txTime}</div>
+        </div>
+        <span class="mono" style="font-size:10px;flex-shrink:0">${l.id}</span>
+      </div>`).join('');
+  }
+
   function updateShareInfo() {
     const sel = document.getElementById('share-degree-select').value;
-    const d = BLOCKCHAIN_DATA.degrees.find(x => x.id === sel);
+    const d = BLOCKCHAIN_DATA.degrees.find(x=>x.id===sel);
     if (!d) return;
     document.getElementById('cert-program').textContent = d.program + ' — ' + getUniName(d.uniId);
     document.getElementById('cert-uni').textContent = getUniName(d.uniId) + ' · ' + d.year;
@@ -467,19 +412,18 @@
   function shareCredential() {
     const email = document.getElementById('share-email').value;
     const fb = document.getElementById('share-feedback');
-    if (!email) { fb.className='verify-result show fail'; fb.textContent='⚠️ Please enter employer email.'; return; }
+    if (!email) { fb.className='verify-result show fail'; fb.textContent='⚠️ Enter employer email first.'; return; }
     fb.className='verify-result show ok';
-    fb.textContent='✅ Verification link sent to ' + email + '\nThe employer can verify your degree hash on the blockchain instantly.';
+    fb.textContent='✅ Verification link sent to '+email+'\nThe employer can verify your degree on blockchain instantly.';
   }
   function copyHash() {
     const sel = document.getElementById('share-degree-select').value;
-    const d = BLOCKCHAIN_DATA.degrees.find(x => x.id === sel);
-    if (d) { navigator.clipboard.writeText(d.hash); alert('Hash copied: ' + d.hash); }
+    const d = BLOCKCHAIN_DATA.degrees.find(x=>x.id===sel);
+    if (d && navigator.clipboard) navigator.clipboard.writeText(d.hash).then(()=>alert('Hash copied!'));
   }
 
-  // Init
-  renderDegrees('overview-degrees', 'STU001', true);
-  renderDegrees('all-degrees-list', 'STU001', false);
+  renderDegrees('overview-degrees','STU001',true);
+  renderDegrees('all-degrees-list','STU001',false);
   renderActivityFeed();
   renderVerifHistory();
   renderTxLog();
