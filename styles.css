@@ -6,7 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 /* ── Theme Variables ── */
-:root {
+html {
   /* Dark mode (default) */
   --bg:        #080c18;
   --surface:   #0e1525;
@@ -37,7 +37,7 @@
 }
 
 /* ── Light Mode ── */
-[data-theme="light"] {
+html[data-theme="light"] {
   --bg:        #f0f4f8;
   --surface:   #ffffff;
   --surface2:  #f8fafc;
@@ -313,7 +313,7 @@ tr:hover td { background: var(--surface2); }
 .badge-orange { background: rgba(249,115,22,.1);  color: var(--orange); border: 1px solid rgba(249,115,22,.3); }
 
 /* light mode badge adjustments */
-[data-theme="light"] .badge-blue { background: rgba(2,132,199,.08); color: var(--accent); }
+html[data-theme="light"] .badge-blue { background: rgba(2,132,199,.08); color: var(--accent); }
 
 /* ══════════════════════════════════════
    BUTTONS
@@ -539,7 +539,7 @@ tr:hover td { background: var(--surface2); }
    RESPONSIVE — MOBILE  ≤ 768px
 ══════════════════════════════════════ */
 @media (max-width: 768px) {
-  :root { --sidebar-w: 260px; }
+  html { --sidebar-w: 260px; }
 
   /* Hide sidebar off-screen */
   .sidebar { transform: translateX(-100%); box-shadow: none; }
@@ -617,25 +617,25 @@ tr:hover td { background: var(--surface2); }
 /* ══════════════════════════════════════
    LIGHT MODE OVERRIDES
 ══════════════════════════════════════ */
-[data-theme="light"] .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,.08); }
-[data-theme="light"] .topbar  { box-shadow: 0 1px 8px rgba(0,0,0,.06); }
-[data-theme="light"] .stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-[data-theme="light"] .degree-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-[data-theme="light"] .terminal { color: #166534; }
-[data-theme="light"] .hash { color: var(--accent); }
-[data-theme="light"] .chain-status { color: var(--green); }
-[data-theme="light"] .dot { background: var(--green); }
-[data-theme="light"] .log-dot.success { box-shadow: 0 0 4px var(--green); }
-[data-theme="light"] .log-dot.warning { box-shadow: 0 0 4px var(--yellow); }
-[data-theme="light"] .log-dot.danger  { box-shadow: 0 0 4px var(--red); }
-[data-theme="light"] .nav-item.active { background: rgba(2,132,199,.06); color: var(--accent); }
-[data-theme="light"] .sidebar-logo .logo-icon { box-shadow: 0 0 14px rgba(2,132,199,.2); }
-[data-theme="light"] .btn-primary { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; }
-[data-theme="light"] .btn-primary:hover { box-shadow: 0 0 14px rgba(2,132,199,.25); }
-[data-theme="light"] .verify-result.ok   { background: rgba(5,150,105,.06); }
-[data-theme="light"] .verify-result.fail { background: rgba(220,38,38,.05); }
-[data-theme="light"] .fraud-card { background: rgba(220,38,38,.04); }
-[data-theme="light"] .bottom-nav { box-shadow: 0 -2px 12px rgba(0,0,0,.08); }
+html[data-theme="light"] .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,.08); }
+html[data-theme="light"] .topbar  { box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+html[data-theme="light"] .stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+html[data-theme="light"] .degree-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+html[data-theme="light"] .terminal { color: #166534; }
+html[data-theme="light"] .hash { color: var(--accent); }
+html[data-theme="light"] .chain-status { color: var(--green); }
+html[data-theme="light"] .dot { background: var(--green); }
+html[data-theme="light"] .log-dot.success { box-shadow: 0 0 4px var(--green); }
+html[data-theme="light"] .log-dot.warning { box-shadow: 0 0 4px var(--yellow); }
+html[data-theme="light"] .log-dot.danger  { box-shadow: 0 0 4px var(--red); }
+html[data-theme="light"] .nav-item.active { background: rgba(2,132,199,.06); color: var(--accent); }
+html[data-theme="light"] .sidebar-logo .logo-icon { box-shadow: 0 0 14px rgba(2,132,199,.2); }
+html[data-theme="light"] .btn-primary { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; }
+html[data-theme="light"] .btn-primary:hover { box-shadow: 0 0 14px rgba(2,132,199,.25); }
+html[data-theme="light"] .verify-result.ok   { background: rgba(5,150,105,.06); }
+html[data-theme="light"] .verify-result.fail { background: rgba(220,38,38,.05); }
+html[data-theme="light"] .fraud-card { background: rgba(220,38,38,.04); }
+html[data-theme="light"] .bottom-nav { box-shadow: 0 -2px 12px rgba(0,0,0,.08); }
 
 /* ── Smooth transitions on theme change ── */
 .sidebar, .main, .topbar, .section, .stat-card, .modal,
